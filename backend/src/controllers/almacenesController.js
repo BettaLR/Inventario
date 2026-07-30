@@ -1,16 +1,21 @@
 const { query } = require('../config/db');
 
 const listar = async (req, res) => {
-  const result = await query(
-    `SELECT a.*, u.nombre AS responsable_nombre,
-       COALESCE(SUM(s.cantidad), 0)::int AS total_unidades
-     FROM almacenes a
-     LEFT JOIN usuarios u ON u.id = a.responsable_id
-     LEFT JOIN stock s ON s.almacen_id = a.id
-     GROUP BY a.id, u.nombre
-     ORDER BY a.nombre`
-  );
-  res.json(result.rows);
+  try {
+    const result = await query(
+      `SELECT a.*, u.nombre AS responsable_nombre,
+         COALESCE(SUM(s.cantidad), 0) AS total_unidades
+       FROM almacenes a
+       LEFT JOIN usuarios u ON u.id = a.responsable_id
+       LEFT JOIN stock s ON s.almacen_id = a.id
+       GROUP BY a.id, u.nombre
+       ORDER BY a.nombre`
+    );
+    res.json(result.rows);
+  } catch (err) {
+    console.error('Error en listar almacenes:', err);
+    res.status(500).json({ message: 'Error al listar almacenes' });
+  }
 };
 
 const crear = async (req, res) => {

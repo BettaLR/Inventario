@@ -2,7 +2,7 @@ const { query } = require('../config/db');
 
 const BASE_SELECT = `
   SELECT p.*, c.nombre AS categoria_nombre, pr.nombre AS proveedor_nombre,
-    COALESCE(SUM(s.cantidad), 0)::int AS stock_total
+    COALESCE(SUM(s.cantidad), 0) AS stock_total
   FROM productos p
   LEFT JOIN categorias c ON c.id = p.categoria_id
   LEFT JOIN proveedores pr ON pr.id = p.proveedor_id
@@ -11,31 +11,36 @@ const BASE_SELECT = `
 const GROUP_BY = ' GROUP BY p.id, c.nombre, pr.nombre ';
 
 const listar = async (req, res) => {
-  const { busqueda, categoria_id, bajo_stock } = req.query;
-  const conditions = [];
-  const params = [];
+  try {
+    const { busqueda, categoria_id, bajo_stock } = req.query;
+    const conditions = [];
+    const params = [];
 
-  if (busqueda) {
-    params.push(busqueda);
-    conditions.push(`to_tsvector('spanish', p.nombre) @@ plainto_tsquery('spanish', $${params.length})
-      OR p.codigo ILIKE '%' || $${params.length} || '%'
-      OR p.codigo_barras ILIKE '%' || $${params.length} || '%'`);
+    if (busqueda) {
+      params.push(busqueda);
+      conditions.push(`(p.nombre LIKE '%' || $${params.length} || '%'
+        OR p.codigo LIKE '%' || $${params.length} || '%'
+        OR p.codigo_barras LIKE '%' || $${params.length} || '%')`);
+    }
+    if (categoria_id) {
+      params.push(categoria_id);
+      conditions.push(`p.categoria_id = $${params.length}`);
+    }
+
+    const where = conditions.length ? `WHERE ${conditions.join(' AND ')}` : '';
+    let sql = `${BASE_SELECT} ${where} ${GROUP_BY}`;
+
+    if (bajo_stock === 'true') {
+      sql += ` HAVING COALESCE(SUM(s.cantidad), 0) <= p.stock_minimo`;
+    }
+    sql += ' ORDER BY p.nombre';
+
+    const result = await query(sql, params);
+    res.json(result.rows);
+  } catch (err) {
+    console.error('Error en listar productos:', err);
+    res.status(500).json({ message: 'Error al listar productos' });
   }
-  if (categoria_id) {
-    params.push(categoria_id);
-    conditions.push(`p.categoria_id = $${params.length}`);
-  }
-
-  const where = conditions.length ? `WHERE ${conditions.join(' AND ')}` : '';
-  let sql = `${BASE_SELECT} ${where} ${GROUP_BY}`;
-
-  if (bajo_stock === 'true') {
-    sql += ` HAVING COALESCE(SUM(s.cantidad), 0) <= p.stock_minimo`;
-  }
-  sql += ' ORDER BY p.nombre';
-
-  const result = await query(sql, params);
-  res.json(result.rows);
 };
 
 const obtener = async (req, res) => {

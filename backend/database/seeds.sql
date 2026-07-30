@@ -5,18 +5,15 @@
 
 -- Roles
 INSERT INTO roles (nombre, descripcion) VALUES
-  ('Admin', 'Acceso total al sistema'),
-  ('Gerente', 'Reportes, dashboard y aprobaciones'),
-  ('Almacenista', 'Registro de movimientos y consulta de stock');
+  ('Administrador', 'Acceso total al sistema'),
+  ('Almacenista', 'Registro de movimientos y consulta de stock'),
+  ('Cliente', 'Consulta de inventario y pedidos');
 
--- Usuarios (passwords hasheados con bcrypt, cost 10)
--- Admin123! -> $2b$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi
+-- Usuarios (password: Admin123!)
 INSERT INTO usuarios (nombre, email, password_hash, rol_id) VALUES
-  ('Erick Guerra',   'erick@inventario.com',   '$2b$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 1),
-  ('Pedro Diaz',     'pedro@inventario.com',   '$2b$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 2),
-  ('Manuel Cano',    'manuel@inventario.com',  '$2b$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 2),
-  ('Ana Lopez',      'ana@inventario.com',     '$2b$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 3),
-  ('Carlos Ruiz',    'carlos@inventario.com',  '$2b$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 3);
+  ('Erick Guerra',   'admin@inventario.com',   '$2a$10$xLsOzaEaxbgYl2QrLTpgAeBqpXCo9lsn9nPMk.LYetTzq0BU8/m9G', 1),
+  ('Ana López',      'almacen@inventario.com', '$2a$10$xLsOzaEaxbgYl2QrLTpgAeBqpXCo9lsn9nPMk.LYetTzq0BU8/m9G', 2),
+  ('Carlos Cliente', 'cliente@inventario.com', '$2a$10$xLsOzaEaxbgYl2QrLTpgAeBqpXCo9lsn9nPMk.LYetTzq0BU8/m9G', 3);
 
 -- Categorias
 INSERT INTO categorias (nombre, descripcion) VALUES

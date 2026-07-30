@@ -4,67 +4,87 @@ const { query } = require('../config/db');
 
 const inventarioValorizadoQuery = `
   SELECT p.codigo, p.nombre, c.nombre AS categoria, p.unidad_medida, p.precio_unitario,
-    COALESCE(SUM(s.cantidad), 0)::int AS stock_total,
-    (COALESCE(SUM(s.cantidad), 0) * p.precio_unitario)::numeric(14,2) AS valor_total
+    COALESCE(SUM(s.cantidad), 0) AS stock_total,
+    (COALESCE(SUM(s.cantidad), 0) * p.precio_unitario) AS valor_total
   FROM productos p
   LEFT JOIN categorias c ON c.id = p.categoria_id
   LEFT JOIN stock s ON s.producto_id = p.id
-  WHERE p.activo = true
+  WHERE p.activo = 1 OR p.activo = true
   GROUP BY p.id, c.nombre
   ORDER BY valor_total DESC
 `;
 
 const inventarioValorizado = async (req, res) => {
-  const result = await query(inventarioValorizadoQuery);
-  const total = result.rows.reduce((acc, r) => acc + Number(r.valor_total), 0);
-  res.json({ items: result.rows, total });
+  try {
+    const result = await query(inventarioValorizadoQuery);
+    const total = result.rows.reduce((acc, r) => acc + Number(r.valor_total), 0);
+    res.json({ items: result.rows, total });
+  } catch (err) {
+    console.error('Error en inventarioValorizado:', err);
+    res.status(500).json({ message: 'Error en reporte inventario valorizado' });
+  }
 };
 
 const rotacion = async (req, res) => {
-  const dias = Math.min(Number(req.query.dias) || 30, 365);
-  const result = await query(
-    `SELECT p.codigo, p.nombre,
-       COALESCE(SUM(CASE WHEN m.tipo = 'salida' THEN m.cantidad ELSE 0 END), 0)::int AS unidades_salida,
-       COALESCE(SUM(CASE WHEN m.tipo IN ('entrada','devolucion') THEN m.cantidad ELSE 0 END), 0)::int AS unidades_entrada,
-       COUNT(m.id)::int AS total_movimientos
-     FROM productos p
-     LEFT JOIN movimientos m ON m.producto_id = p.id AND m.created_at >= CURRENT_DATE - ($1 || ' days')::interval
-     WHERE p.activo = true
-     GROUP BY p.id
-     ORDER BY unidades_salida DESC`,
-    [dias]
-  );
-  res.json({ dias, items: result.rows });
+  try {
+    const dias = Math.min(Number(req.query.dias) || 30, 365);
+    const result = await query(
+      `SELECT p.codigo, p.nombre,
+         COALESCE(SUM(CASE WHEN m.tipo = 'salida' THEN m.cantidad ELSE 0 END), 0) AS unidades_salida,
+         COALESCE(SUM(CASE WHEN m.tipo IN ('entrada','devolucion') THEN m.cantidad ELSE 0 END), 0) AS unidades_entrada,
+         COUNT(m.id) AS total_movimientos
+       FROM productos p
+       LEFT JOIN movimientos m ON m.producto_id = p.id AND DATE(m.created_at) >= DATE('now', '-' || $1 || ' days')
+       WHERE p.activo = 1 OR p.activo = true
+       GROUP BY p.id
+       ORDER BY unidades_salida DESC`,
+      [dias]
+    );
+    res.json({ dias, items: result.rows });
+  } catch (err) {
+    console.error('Error en rotacion:', err);
+    res.status(500).json({ message: 'Error en reporte de rotacion' });
+  }
 };
 
 const mermas = async (req, res) => {
-  const result = await query(
-    `SELECT m.id, p.codigo, p.nombre, a.nombre AS almacen, m.cantidad_anterior, m.cantidad_nueva,
-       (m.cantidad_anterior - m.cantidad_nueva) AS unidades_perdidas, m.motivo, m.created_at, u.nombre AS usuario_nombre
-     FROM movimientos m
-     JOIN productos p ON p.id = m.producto_id
-     JOIN almacenes a ON a.id = m.almacen_id
-     JOIN usuarios u ON u.id = m.usuario_id
-     WHERE m.tipo = 'ajuste' AND m.cantidad_nueva < m.cantidad_anterior
-     ORDER BY m.created_at DESC
-     LIMIT 200`
-  );
-  res.json(result.rows);
+  try {
+    const result = await query(
+      `SELECT m.id, p.codigo, p.nombre, a.nombre AS almacen, m.cantidad_anterior, m.cantidad_nueva,
+         (m.cantidad_anterior - m.cantidad_nueva) AS unidades_perdidas, m.motivo, m.created_at, u.nombre AS usuario_nombre
+       FROM movimientos m
+       JOIN productos p ON p.id = m.producto_id
+       JOIN almacenes a ON a.id = m.almacen_id
+       JOIN usuarios u ON u.id = m.usuario_id
+       WHERE m.tipo = 'ajuste' AND m.cantidad_nueva < m.cantidad_anterior
+       ORDER BY m.created_at DESC
+       LIMIT 200`
+    );
+    res.json(result.rows);
+  } catch (err) {
+    console.error('Error en mermas:', err);
+    res.status(500).json({ message: 'Error en reporte de mermas' });
+  }
 };
 
 const alertasStock = async (req, res) => {
-  const result = await query(
-    `SELECT p.id, p.codigo, p.nombre, p.stock_minimo, c.nombre AS categoria,
-       COALESCE(SUM(s.cantidad), 0)::int AS stock_total
-     FROM productos p
-     LEFT JOIN categorias c ON c.id = p.categoria_id
-     LEFT JOIN stock s ON s.producto_id = p.id
-     WHERE p.activo = true
-     GROUP BY p.id, c.nombre
-     HAVING COALESCE(SUM(s.cantidad), 0) <= p.stock_minimo
-     ORDER BY stock_total ASC`
-  );
-  res.json(result.rows);
+  try {
+    const result = await query(
+      `SELECT p.id, p.codigo, p.nombre, p.stock_minimo, c.nombre AS categoria,
+         COALESCE(SUM(s.cantidad), 0) AS stock_total
+       FROM productos p
+       LEFT JOIN categorias c ON c.id = p.categoria_id
+       LEFT JOIN stock s ON s.producto_id = p.id
+       WHERE p.activo = 1 OR p.activo = true
+       GROUP BY p.id, c.nombre
+       HAVING COALESCE(SUM(s.cantidad), 0) <= p.stock_minimo
+       ORDER BY stock_total ASC`
+    );
+    res.json(result.rows);
+  } catch (err) {
+    console.error('Error en alertasStock:', err);
+    res.status(500).json({ message: 'Error en reporte de alertas de stock' });
+  }
 };
 
 const inventarioValorizadoPdf = async (req, res) => {

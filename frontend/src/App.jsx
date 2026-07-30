@@ -35,14 +35,8 @@ export default function App() {
                 <Route path="/kardex" element={<KardexPage />} />
                 <Route path="/productos" element={<ProductosPage />} />
                 <Route path="/catalogos" element={<CatalogosPage />} />
-
-                <Route element={<ProtectedRoute roles={['Admin', 'Gerente']} />}>
-                  <Route path="/reportes" element={<ReportesPage />} />
-                </Route>
-
-                <Route element={<ProtectedRoute roles={['Admin']} />}>
-                  <Route path="/usuarios" element={<UsuariosPage />} />
-                </Route>
+                <Route path="/reportes" element={<ReportesPage />} />
+                <Route path="/usuarios" element={<UsuariosPage />} />
               </Route>
             </Route>
 
