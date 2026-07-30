@@ -2,6 +2,14 @@ require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
 const authRoutes = require('./routes/authRoutes');
+const productosRoutes = require('./routes/productosRoutes');
+const proveedoresRoutes = require('./routes/proveedoresRoutes');
+const almacenesRoutes = require('./routes/almacenesRoutes');
+const categoriasRoutes = require('./routes/categoriasRoutes');
+const movimientosRoutes = require('./routes/movimientosRoutes');
+const dashboardRoutes = require('./routes/dashboardRoutes');
+const reportesRoutes = require('./routes/reportesRoutes');
+const usuariosRoutes = require('./routes/usuariosRoutes');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -19,6 +27,14 @@ app.get('/health', (req, res) => {
 });
 
 app.use('/api/auth', authRoutes);
+app.use('/api/productos', productosRoutes);
+app.use('/api/proveedores', proveedoresRoutes);
+app.use('/api/almacenes', almacenesRoutes);
+app.use('/api/categorias', categoriasRoutes);
+app.use('/api/movimientos', movimientosRoutes);
+app.use('/api/dashboard', dashboardRoutes);
+app.use('/api/reportes', reportesRoutes);
+app.use('/api/usuarios', usuariosRoutes);
 
 app.use((req, res) => {
   res.status(404).json({ message: 'Ruta no encontrada' });

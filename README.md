@@ -31,6 +31,11 @@ psql -U postgres -d inventario_db -f backend/database/schema.sql
 psql -U postgres -d inventario_db -f backend/database/seeds.sql
 ```
 
+> Si ya tenías la base de datos creada antes del Sprint 2, aplica la migración en vez de recrear todo:
+> ```bash
+> psql -U postgres -d inventario_db -f backend/database/migration_sprint2.sql
+> ```
+
 ### 2. Backend
 
 ```bash
@@ -60,13 +65,28 @@ npm run dev               # Corre en http://localhost:5173
 
 > **Nota:** El hash en seeds.sql es `password`. Antes de producción, regenerar con bcrypt.
 
-## Endpoints disponibles (Sprint 1)
+## Endpoints disponibles
 
-| Método | Ruta            | Auth | Descripción          |
-|--------|-----------------|------|----------------------|
-| GET    | /health         | No   | Estado del servidor  |
-| POST   | /api/auth/login | No   | Login, retorna JWT   |
-| GET    | /api/auth/me    | Sí   | Usuario autenticado  |
+| Método | Ruta                                      | Auth  | Descripción                          |
+|--------|-------------------------------------------|-------|---------------------------------------|
+| GET    | /health                                   | No    | Estado del servidor                   |
+| POST   | /api/auth/login                           | No    | Login, retorna JWT                    |
+| GET    | /api/auth/me                               | Sí    | Usuario autenticado                   |
+| GET/POST/PUT/DELETE | /api/productos                | Sí    | CRUD de productos                     |
+| GET    | /api/productos/codigo/:codigo              | Sí    | Buscar producto por SKU/código barras |
+| GET/POST/PUT/DELETE | /api/proveedores               | Sí    | CRUD de proveedores + historial compras |
+| GET/POST/PUT/DELETE | /api/almacenes                 | Sí    | CRUD de almacenes                     |
+| GET/POST/PUT/DELETE | /api/categorias                | Sí    | CRUD de categorías                    |
+| GET    | /api/movimientos                           | Sí    | Kardex (filtrable por producto/almacén/tipo) |
+| POST   | /api/movimientos                           | Sí    | Registrar entrada/salida/ajuste/transferencia/devolución |
+| GET    | /api/dashboard/stats                       | Sí    | Métricas del dashboard                |
+| GET    | /api/reportes/inventario-valorizado        | Sí    | Inventario valorizado (JSON)          |
+| GET    | /api/reportes/inventario-valorizado/pdf    | Sí    | Exportar a PDF                        |
+| GET    | /api/reportes/inventario-valorizado/excel  | Sí    | Exportar a Excel                      |
+| GET    | /api/reportes/rotacion                     | Sí    | Rotación de productos                 |
+| GET    | /api/reportes/mermas                       | Sí    | Mermas (ajustes que reducen stock)    |
+| GET    | /api/reportes/alertas-stock                | Sí    | Productos bajo stock mínimo           |
+| GET/PATCH | /api/usuarios                           | Sí (Admin) | Gestión de usuarios              |
 
 ## Sprints
 

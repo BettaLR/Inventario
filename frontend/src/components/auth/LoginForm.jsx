@@ -32,67 +32,59 @@ export default function LoginForm() {
   });
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-slate-100">
-      <div className="bg-white rounded-2xl shadow-lg p-8 w-full max-w-md">
+    <div className="min-h-screen flex items-center justify-center bg-charcoal-800">
+      <div className="bg-surface border border-line rounded-[4px] shadow-xl p-8 w-full max-w-md">
         <div className="text-center mb-8">
-          <div className="text-4xl mb-2">📦</div>
-          <h1 className="text-2xl font-bold text-slate-800">Control de Inventarios</h1>
-          <p className="text-slate-500 text-sm mt-1">Ingresa con tu cuenta</p>
+          <div className="w-10 h-1 bg-accent-500 mx-auto mb-4" />
+          <h1 className="text-xl font-bold text-ink-900 tracking-tight uppercase">Control de Inventarios</h1>
+          <p className="text-ink-400 text-sm mt-1">Ingresa con tu cuenta</p>
         </div>
 
         <form onSubmit={formik.handleSubmit} noValidate>
           <div className="mb-4">
-            <label htmlFor="email" className="block text-sm font-medium text-slate-700 mb-1">
+            <label htmlFor="email" className="block text-xs font-semibold uppercase tracking-wide text-ink-600 mb-1.5">
               Email
             </label>
             <input
               id="email"
               type="email"
               autoComplete="email"
-              className={`w-full px-3 py-2 border rounded-lg text-sm outline-none transition
-                ${formik.touched.email && formik.errors.email
-                  ? 'border-red-400 focus:ring-2 focus:ring-red-200'
-                  : 'border-slate-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-100'
-                }`}
+              className={`field-input ${formik.touched.email && formik.errors.email ? 'field-input-error' : ''}`}
               placeholder="usuario@inventario.com"
               {...formik.getFieldProps('email')}
             />
             {formik.touched.email && formik.errors.email && (
-              <p className="text-red-500 text-xs mt-1">{formik.errors.email}</p>
+              <p className="text-state-danger text-xs mt-1">{formik.errors.email}</p>
             )}
           </div>
 
           <div className="mb-6">
-            <label htmlFor="password" className="block text-sm font-medium text-slate-700 mb-1">
+            <label htmlFor="password" className="block text-xs font-semibold uppercase tracking-wide text-ink-600 mb-1.5">
               Contraseña
             </label>
             <input
               id="password"
               type="password"
               autoComplete="current-password"
-              className={`w-full px-3 py-2 border rounded-lg text-sm outline-none transition
-                ${formik.touched.password && formik.errors.password
-                  ? 'border-red-400 focus:ring-2 focus:ring-red-200'
-                  : 'border-slate-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-100'
-                }`}
+              className={`field-input ${formik.touched.password && formik.errors.password ? 'field-input-error' : ''}`}
               placeholder="••••••••"
               {...formik.getFieldProps('password')}
             />
             {formik.touched.password && formik.errors.password && (
-              <p className="text-red-500 text-xs mt-1">{formik.errors.password}</p>
+              <p className="text-state-danger text-xs mt-1">{formik.errors.password}</p>
             )}
           </div>
 
           {errorServidor && (
-            <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg">
-              <p className="text-red-600 text-sm">{errorServidor}</p>
+            <div className="mb-4 p-3 bg-[#FBE9E7] border border-state-danger/30 rounded-[3px]">
+              <p className="text-state-danger text-sm">{errorServidor}</p>
             </div>
           )}
 
           <button
             type="submit"
             disabled={formik.isSubmitting}
-            className="w-full bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white font-medium py-2.5 rounded-lg transition text-sm"
+            className="w-full bg-accent-500 hover:bg-accent-600 disabled:bg-accent-100 text-white font-semibold py-2.5 rounded-[3px] transition-colors text-sm tracking-wide"
           >
             {formik.isSubmitting ? 'Iniciando sesión...' : 'Iniciar sesión'}
           </button>
