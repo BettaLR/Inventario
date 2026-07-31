@@ -40,31 +40,31 @@ function Icon({ name }) {
 
 const navItems = [
   { to: '/dashboard',  label: 'Administración',         icon: 'dashboard' },
-  { to: '/productos',  label: 'Gestión de Productos',   icon: 'productos' },
-  { to: '/kardex',     label: 'Gestión de Inventarios', icon: 'kardex' },
-  { to: '/catalogos',  label: 'Gestión de Catálogos',   icon: 'catalogos' },
+  { to: '/productos',  label: 'Productos',             icon: 'productos' },
+  { to: '/kardex',     label: 'Inventarios / Kardex',   icon: 'kardex' },
+  { to: '/catalogos',  label: 'Catálogos',             icon: 'catalogos' },
   { to: '/reportes',   label: 'Reportes',              icon: 'reportes' },
-  { to: '/usuarios',   label: 'Gestión de Usuarios',    icon: 'usuarios' },
+  { to: '/usuarios',   label: 'Usuarios',              icon: 'usuarios' },
 ];
 
 export default function Sidebar({ onCloseMobile }) {
   const { usuario } = useAuth();
 
   return (
-    <aside className="w-64 bg-[#22272E] h-full flex flex-col shrink-0 text-slate-300 select-none border-r border-[#1C2128]">
+    <aside className="w-52 sm:w-56 bg-[#22272E] h-full flex flex-col shrink-0 text-slate-300 select-none border-r border-[#1C2128]">
       {/* Top User Profile Header */}
-      <div className="p-4 border-b border-[#2C333D] flex items-center justify-between bg-[#1C2128]">
-        <div className="flex items-center gap-3">
-          <div className="w-9 h-9 rounded-full bg-slate-700 text-white font-bold text-sm flex items-center justify-center border border-slate-500 shadow-sm shrink-0">
+      <div className="p-3.5 border-b border-[#2C333D] flex items-center justify-between bg-[#1C2128]">
+        <div className="flex items-center gap-2.5 min-w-0">
+          <div className="w-8 h-8 rounded-full bg-slate-700 text-white font-bold text-xs flex items-center justify-center border border-slate-500 shadow-sm shrink-0">
             {usuario?.nombre?.[0]?.toUpperCase() || 'U'}
           </div>
-          <div className="overflow-hidden">
+          <div className="overflow-hidden min-w-0">
             <span className="text-white font-bold text-xs truncate block">
               {usuario?.nombre || 'Usuario'}
             </span>
             <div className="flex items-center gap-1.5 mt-0.5">
-              <span className="w-2 h-2 rounded-full bg-emerald-500 inline-block"></span>
-              <span className="text-[10px] text-emerald-400 font-semibold">Online</span>
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 inline-block"></span>
+              <span className="text-[10px] text-emerald-400 font-medium">Online</span>
             </div>
           </div>
         </div>
@@ -73,7 +73,7 @@ export default function Sidebar({ onCloseMobile }) {
         {onCloseMobile && (
           <button
             onClick={onCloseMobile}
-            className="lg:hidden p-1.5 text-slate-400 hover:text-white rounded-md transition-colors"
+            className="lg:hidden p-1 text-slate-400 hover:text-white rounded-md transition-colors"
           >
             ✕
           </button>
@@ -81,32 +81,31 @@ export default function Sidebar({ onCloseMobile }) {
       </div>
 
       {/* Navigation List */}
-      <nav className="flex-1 py-4 px-2 space-y-1 overflow-y-auto text-xs">
+      <nav className="flex-1 py-3 px-2 space-y-1 overflow-y-auto text-xs">
         {navItems.map((item) => (
           <NavLink
             key={item.to}
             to={item.to}
             onClick={onCloseMobile}
             className={({ isActive }) =>
-              `flex items-center justify-between px-3.5 py-2.5 rounded-md font-medium transition-colors ${
+              `flex items-center justify-between px-3 py-2 rounded-lg font-medium transition-colors ${
                 isActive
-                  ? 'bg-[#1C2128] text-white font-bold border-l-4 border-amber-500 pl-3'
+                  ? 'bg-[#1C2128] text-white font-bold border-l-4 border-amber-500 pl-2.5'
                   : 'text-slate-300 hover:bg-[#2C333D] hover:text-white'
               }`
             }
           >
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-2.5 min-w-0 truncate">
               <Icon name={item.icon} />
-              <span>{item.label}</span>
+              <span className="truncate">{item.label}</span>
             </div>
-            <span className="text-[10px] text-slate-500 font-mono">&lt;</span>
           </NavLink>
         ))}
       </nav>
 
       {/* Sidebar Footer */}
       <div className="p-3 bg-[#1C2128] border-t border-[#2C333D] text-[10px] text-slate-500 flex justify-between items-center">
-        <span>ERP / WMS System</span>
+        <span>WMS System</span>
         <span className="text-amber-500 font-mono">v2.4</span>
       </div>
     </aside>

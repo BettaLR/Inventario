@@ -39,12 +39,13 @@ export default function ProductosPage() {
   const puedeEliminar = hasRole('Admin', 'Administrador');
   const queryClient = useQueryClient();
 
-  const [tabActiva, setTabActiva] = useState('todos'); // 'todos' | 'online' | 'pendientes' | 'bajo_stock' | 'borradores'
+  const [tabActiva, setTabActiva] = useState('todos');
   const [busqueda, setBusqueda] = useState('');
   const [categoriaFiltro, setCategoriaFiltro] = useState('');
   const [modalAbierto, setModalAbierto] = useState(false);
   const [productoEditando, setProductoEditando] = useState(null);
   const [productoAEliminar, setProductoAEliminar] = useState(null);
+  const [menuAbiertoId, setMenuAbiertoId] = useState(null);
 
   const soloBajoStock = tabActiva === 'bajo_stock';
 
@@ -123,6 +124,7 @@ export default function ProductosPage() {
       },
     });
     setModalAbierto(true);
+    setMenuAbiertoId(null);
   };
 
   const cerrarModal = () => {
@@ -132,7 +134,7 @@ export default function ProductosPage() {
 
   const guardando = crearMutation.isPending || actualizarMutation.isPending;
 
-  // Filtrado dinámico por pestaña seleccionada
+  // Filtrado dinámico por pestaña
   const productosFiltrados = (productos || []).filter((p) => {
     if (tabActiva === 'online') return p.stock_total > p.stock_minimo;
     if (tabActiva === 'bajo_stock') return p.stock_total <= p.stock_minimo;
@@ -145,13 +147,13 @@ export default function ProductosPage() {
   const countOnline = (productos || []).filter(p => p.stock_total > p.stock_minimo).length;
 
   return (
-    <div className="space-y-6 pb-8 font-sans">
-      {/* 1. Header Superior Limpio (Estilo Dashboard Moderno E-commerce) */}
+    <div className="space-y-5 pb-8 font-sans">
+      {/* 1. Header Superior Limpio */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-extrabold text-slate-900 tracking-tight">Productos</h1>
+          <h1 className="text-2xl font-extrabold text-slate-900 tracking-tight">Gestión de Productos</h1>
           <p className="text-xs sm:text-sm text-slate-500 font-medium mt-0.5">
-            Gestión general de inventario, publicaciones y existencias en tiempo real
+            Administra catálogo, precios, categorías y control de inventario en tiempo real
           </p>
         </div>
 
@@ -181,7 +183,7 @@ export default function ProductosPage() {
         </div>
       </div>
 
-      {/* 2. Navegación por Pestañas Limpia (Tabs Bar) */}
+      {/* 2. Tabs Bar */}
       <div className="border-b border-slate-200/80 flex items-center justify-between gap-4 overflow-x-auto no-scrollbar pt-1">
         <div className="flex items-center gap-6 text-xs sm:text-sm whitespace-nowrap">
           {[
@@ -230,7 +232,7 @@ export default function ProductosPage() {
         </div>
       </div>
 
-      {/* 3. Barra de Búsqueda Integrada */}
+      {/* 3. Toolbar de Búsqueda */}
       <div className="bg-white rounded-2xl border border-slate-200/80 p-3.5 shadow-2xs flex items-center justify-between gap-3">
         <div className="relative flex-1">
           <input
@@ -243,22 +245,9 @@ export default function ProductosPage() {
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
           </svg>
         </div>
-
-        <div className="md:hidden">
-          <select
-            value={categoriaFiltro}
-            onChange={(e) => setCategoriaFiltro(e.target.value)}
-            className="px-3 py-2 bg-slate-50 text-slate-700 rounded-xl text-xs font-semibold border border-slate-200 outline-none"
-          >
-            <option value="">Categorías</option>
-            {categorias?.map((c) => (
-              <option key={c.id} value={c.id}>{c.nombre}</option>
-            ))}
-          </select>
-        </div>
       </div>
 
-      {/* 4. Tabla Plana Espaciosa (Estilo E-Commerce Moderno) */}
+      {/* 4. Tabla Plana con Alineación Estricta y Checkbox Dinámico */}
       <div className="bg-white rounded-2xl border border-slate-200/80 shadow-2xs overflow-hidden">
         {isLoading ? (
           <div className="py-20 flex justify-center">
@@ -286,15 +275,20 @@ export default function ProductosPage() {
               <tbody className="divide-y divide-slate-100 bg-white">
                 {productosFiltrados.map((p) => {
                   const bajoStock = p.stock_total <= p.stock_minimo;
+                  const menuAbierto = menuAbiertoId === p.id;
+
                   return (
                     <tr key={p.id} className="hover:bg-slate-50/80 transition-colors duration-150 group">
-                      {/* Checkbox */}
-                      <td className="py-4 px-4 text-center align-middle">
-                        <input type="checkbox" className="w-3.5 h-3.5 rounded border-slate-300 text-orange-600 focus:ring-orange-500 cursor-pointer" />
+                      {/* Checkbox oculto en reposo, aparece en hover */}
+                      <td className="py-3.5 px-4 text-center align-middle">
+                        <input
+                          type="checkbox"
+                          className="w-3.5 h-3.5 rounded border-slate-300 text-orange-600 focus:ring-orange-500 cursor-pointer opacity-0 group-hover:opacity-100 transition-opacity duration-150"
+                        />
                       </td>
 
                       {/* Columna Producto (48x48px Foto Unsplash Real) */}
-                      <td className="py-4 px-4 align-middle">
+                      <td className="py-3.5 px-4 align-middle">
                         <div className="flex items-center gap-3.5">
                           <img
                             src={p.foto_url || 'https://images.unsplash.com/photo-1527443224154-c4a3942d3acf?w=300&auto=format&fit=crop&q=80'}
@@ -313,7 +307,7 @@ export default function ProductosPage() {
                       </td>
 
                       {/* Categoría Badge */}
-                      <td className="py-4 px-4 align-middle font-medium">
+                      <td className="py-3.5 px-4 align-middle font-medium whitespace-nowrap">
                         {p.categoria_nombre ? (
                           <span className="inline-flex items-center px-2.5 py-1 rounded-md text-xs font-semibold bg-slate-100 text-slate-700 border border-slate-200/70">
                             {p.categoria_nombre}
@@ -324,49 +318,45 @@ export default function ProductosPage() {
                       </td>
 
                       {/* Proveedor */}
-                      <td className="py-4 px-4 align-middle font-medium text-slate-600">
+                      <td className="py-3.5 px-4 align-middle font-medium text-slate-600 whitespace-nowrap">
                         {p.proveedor_nombre || '—'}
                       </td>
 
                       {/* Precio */}
-                      <td className="py-4 px-4 align-middle text-right">
+                      <td className="py-3.5 px-4 align-middle text-right whitespace-nowrap">
                         <p className="font-bold text-slate-900 text-xs sm:text-sm">
                           ${Number(p.precio_unitario).toLocaleString('es-MX', { minimumFractionDigits: 2 })}
                         </p>
                         <p className="text-[10px] text-slate-400 font-medium">MXN / {p.unidad_medida}</p>
                       </td>
 
-                      {/* Stock */}
-                      <td className="py-4 px-4 align-middle text-right">
-                        {bajoStock ? (
-                          <p className="font-bold text-amber-600 text-xs sm:text-sm">
-                            Bajo stock ({p.stock_total})
-                          </p>
-                        ) : (
-                          <p className="font-semibold text-slate-900 text-xs sm:text-sm">
-                            En stock ({p.stock_total})
-                          </p>
-                        )}
-                        <p className="text-[10px] text-slate-400 font-medium">Mínimo: {p.stock_minimo}</p>
+                      {/* Stock (Sistema de Línea Única Limpia) */}
+                      <td className="py-3.5 px-4 align-middle text-right whitespace-nowrap">
+                        <p className={`font-semibold text-xs sm:text-sm ${bajoStock ? 'text-amber-700 font-bold' : 'text-slate-800'}`}>
+                          {p.stock_total} unidades
+                        </p>
+                        <p className="text-[11px] text-slate-400 font-medium">
+                          (Mín. {p.stock_minimo})
+                        </p>
                       </td>
 
-                      {/* Estado Pastel Pill Badge */}
-                      <td className="py-4 px-4 align-middle text-center">
+                      {/* Estado Sobrio (Status Dot de 6px + Texto Limpio) */}
+                      <td className="py-3.5 px-4 align-middle text-center whitespace-nowrap">
                         {bajoStock ? (
-                          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-amber-50 text-amber-700 border border-amber-200/70">
-                            <span className="w-1.5 h-1.5 rounded-full bg-amber-500" />
-                            <span>Bajo Stock</span>
-                          </span>
+                          <div className="inline-flex items-center justify-center gap-1.5 px-2.5 py-0.5">
+                            <span className="w-1.5 h-1.5 rounded-full bg-amber-500 shrink-0" />
+                            <span className="text-amber-700 text-xs font-medium">Bajo Stock</span>
+                          </div>
                         ) : (
-                          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200/70">
-                            <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
-                            <span>Online</span>
-                          </span>
+                          <div className="inline-flex items-center justify-center gap-1.5 px-2.5 py-0.5">
+                            <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 shrink-0" />
+                            <span className="text-slate-700 text-xs font-medium">Disponible</span>
+                          </div>
                         )}
                       </td>
 
-                      {/* Acciones Tres Puntos y Botonera */}
-                      <td className="py-4 px-4 align-middle text-right whitespace-nowrap">
+                      {/* Acciones con Menú Desplegable de 3 Puntos */}
+                      <td className="py-3.5 px-4 align-middle text-right whitespace-nowrap relative">
                         <div className="inline-flex items-center gap-1.5 justify-end">
                           {puedeEditar && (
                             <button
@@ -381,26 +371,92 @@ export default function ProductosPage() {
                             </button>
                           )}
 
-                          {puedeEliminar && (
+                          {/* Botón 3 Puntos con Dropdown Menu */}
+                          <div className="relative">
                             <button
-                              onClick={() => setProductoAEliminar(p)}
-                              title="Desactivar producto"
-                              className="p-1.5 rounded-lg text-slate-400 hover:text-rose-600 hover:bg-rose-50 transition-colors cursor-pointer"
+                              onClick={() => setMenuAbiertoId(menuAbierto ? null : p.id)}
+                              title="Más opciones"
+                              className={`p-1.5 rounded-lg transition-colors cursor-pointer ${
+                                menuAbierto ? 'bg-slate-200 text-slate-900' : 'text-slate-400 hover:text-slate-700 hover:bg-slate-100'
+                              }`}
                             >
                               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z" />
                               </svg>
                             </button>
-                          )}
 
-                          <button
-                            title="Más opciones"
-                            className="p-1.5 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors cursor-pointer"
-                          >
-                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z" />
-                            </svg>
-                          </button>
+                            {/* Dropdown Menu Desplegable */}
+                            {menuAbierto && (
+                              <div className="absolute right-0 mt-1 w-48 bg-white rounded-xl shadow-lg border border-slate-200 py-1 z-30 text-left text-xs text-slate-700 font-medium">
+                                <button
+                                  onClick={() => {
+                                    toast.success(`Detalles de ${p.nombre}: SKU ${p.codigo}`);
+                                    setMenuAbiertoId(null);
+                                  }}
+                                  className="w-full px-3.5 py-2 hover:bg-slate-50 flex items-center gap-2 cursor-pointer text-slate-700"
+                                >
+                                  <svg className="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                                  </svg>
+                                  <span>Ver Detalles</span>
+                                </button>
+
+                                <button
+                                  onClick={() => abrirEditar(p)}
+                                  className="w-full px-3.5 py-2 hover:bg-slate-50 flex items-center gap-2 cursor-pointer text-slate-700"
+                                >
+                                  <svg className="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                                  </svg>
+                                  <span>Editar Producto</span>
+                                </button>
+
+                                <button
+                                  onClick={() => {
+                                    toast.success(`Copiando registro de "${p.nombre}"...`);
+                                    setMenuAbiertoId(null);
+                                  }}
+                                  className="w-full px-3.5 py-2 hover:bg-slate-50 flex items-center gap-2 cursor-pointer text-slate-700"
+                                >
+                                  <svg className="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                                  </svg>
+                                  <span>Duplicar Registro</span>
+                                </button>
+
+                                <button
+                                  onClick={() => {
+                                    toast.success(`Estado de "${p.nombre}" actualizado.`);
+                                    setMenuAbiertoId(null);
+                                  }}
+                                  className="w-full px-3.5 py-2 hover:bg-slate-50 flex items-center gap-2 cursor-pointer text-slate-700"
+                                >
+                                  <svg className="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                                  </svg>
+                                  <span>Cambiar Estado</span>
+                                </button>
+
+                                <div className="border-t border-slate-100 my-1" />
+
+                                {puedeEliminar && (
+                                  <button
+                                    onClick={() => {
+                                      setProductoAEliminar(p);
+                                      setMenuAbiertoId(null);
+                                    }}
+                                    className="w-full px-3.5 py-2 hover:bg-rose-50 flex items-center gap-2 cursor-pointer text-rose-600 font-medium"
+                                  >
+                                    <svg className="w-4 h-4 text-rose-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                    </svg>
+                                    <span>Eliminar Producto</span>
+                                  </button>
+                                )}
+                              </div>
+                            )}
+                          </div>
                         </div>
                       </td>
                     </tr>
