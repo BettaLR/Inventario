@@ -1,3 +1,4 @@
+const bcrypt = require('bcryptjs');
 const { query } = require('../config/db');
 
 const listar = async (req, res) => {
@@ -14,6 +15,23 @@ const listarRoles = async (req, res) => {
   res.json(result.rows);
 };
 
+const crear = async (req, res) => {
+  const { nombre, email, password, rol_id } = req.body;
+  if (!nombre || !email || !password) {
+    return res.status(400).json({ message: 'Nombre, email y contraseña son requeridos' });
+  }
+
+  const hash = await bcrypt.hash(password, 10);
+  const rolId = Number(rol_id) || 2;
+
+  const result = await query(
+    `INSERT INTO usuarios (nombre, email, password_hash, rol_id, activo)
+     VALUES ($1, $2, $3, $4, 1) RETURNING id, nombre, email, activo`,
+    [nombre, email, hash, rolId]
+  );
+  res.status(201).json(result.rows[0]);
+};
+
 const actualizarEstado = async (req, res) => {
   const { id } = req.params;
   const { activo } = req.body;
@@ -25,4 +43,4 @@ const actualizarEstado = async (req, res) => {
   res.json(result.rows[0]);
 };
 
-module.exports = { listar, listarRoles, actualizarEstado };
+module.exports = { listar, listarRoles, crear, actualizarEstado };
