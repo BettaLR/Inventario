@@ -25,11 +25,11 @@ export default function Layout() {
         <Sidebar onCloseMobile={() => setSidebarOpen(false)} />
       </div>
 
-      {/* Main App Container */}
+      {/* Main App Container - Full Width Expansion */}
       <div className="flex flex-col flex-1 min-w-0 h-screen overflow-hidden bg-[#ECF0F5]">
         <Navbar onToggleSidebar={() => setSidebarOpen((prev) => !prev)} />
-        <main className="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8">
-          <div className="max-w-[1600px] mx-auto space-y-6">
+        <main className="flex-1 overflow-y-auto p-3 sm:p-5 lg:p-6">
+          <div className="w-full max-w-[1700px] mx-auto space-y-6">
             <Outlet />
           </div>
         </main>

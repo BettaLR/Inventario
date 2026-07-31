@@ -11,7 +11,6 @@ import { listarProveedores } from '../services/proveedoresService';
 import { useAuth } from '../context/AuthContext';
 import Modal from '../components/ui/Modal';
 import Field, { inputClass } from '../components/ui/Field';
-import Button from '../components/ui/Button';
 import Spinner from '../components/ui/Spinner';
 import EmptyState from '../components/ui/EmptyState';
 import ConfirmDialog from '../components/ui/ConfirmDialog';
@@ -32,6 +31,33 @@ const emptyProducto = {
   codigo: '', codigo_barras: '', nombre: '', descripcion: '', foto_url: '',
   categoria_id: '', proveedor_id: '', unidad_medida: 'unidad', precio_unitario: '', stock_minimo: '',
 };
+
+// Componente Robusto de Imagen con Fallback anti-imágenes rotas
+function ProductImage({ src, nombre }) {
+  const [errorImg, setErrorImg] = useState(false);
+
+  if (!src || errorImg) {
+    return (
+      <div className="w-11 h-11 rounded-xl bg-slate-100 border border-slate-200/80 flex items-center justify-center shrink-0 text-slate-400 shadow-2xs">
+        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
+        </svg>
+      </div>
+    );
+  }
+
+  return (
+    <img
+      src={src}
+      alt=""
+      onError={(e) => {
+        e.currentTarget.onerror = null;
+        setErrorImg(true);
+      }}
+      className="w-11 h-11 rounded-xl object-cover border border-slate-200/80 shrink-0 shadow-2xs bg-slate-50"
+    />
+  );
+}
 
 export default function ProductosPage() {
   const { hasRole } = useAuth();
@@ -147,7 +173,7 @@ export default function ProductosPage() {
   const countOnline = (productos || []).filter(p => p.stock_total > p.stock_minimo).length;
 
   return (
-    <div className="space-y-5 pb-8 font-sans">
+    <div className="space-y-5 pb-8 font-sans w-full">
       {/* 1. Header Superior Limpio */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
@@ -247,8 +273,8 @@ export default function ProductosPage() {
         </div>
       </div>
 
-      {/* 4. Tabla Plana con Alineación Estricta y Checkbox Dinámico */}
-      <div className="bg-white rounded-2xl border border-slate-200/80 shadow-2xs overflow-hidden">
+      {/* 4. Tabla Plana Ampliada y Dilatada sin Cortes (min-w-[980px]) */}
+      <div className="bg-white rounded-2xl border border-slate-200/80 shadow-2xs overflow-hidden w-full">
         {isLoading ? (
           <div className="py-20 flex justify-center">
             <Spinner />
@@ -256,20 +282,20 @@ export default function ProductosPage() {
         ) : !productosFiltrados.length ? (
           <EmptyState title="No se encontraron productos" subtitle="No hay productos en esta sección o con los filtros aplicados." />
         ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full text-left text-xs sm:text-sm border-collapse">
+          <div className="overflow-x-auto w-full">
+            <table className="w-full min-w-[980px] text-left text-xs sm:text-sm border-collapse">
               <thead>
-                <tr className="bg-slate-50/70 border-b border-slate-200/80 text-[11px] font-bold text-slate-500 uppercase tracking-wider">
-                  <th className="py-3.5 px-4 w-10 text-center">
+                <tr className="bg-slate-50/80 border-b border-slate-200/80 text-[11px] font-bold text-slate-500 uppercase tracking-wider">
+                  <th className="py-3.5 px-3 w-10 text-center">
                     <input type="checkbox" className="w-3.5 h-3.5 rounded border-slate-300 text-orange-600 focus:ring-orange-500 cursor-pointer" />
                   </th>
-                  <th className="py-3.5 px-4">Producto</th>
-                  <th className="py-3.5 px-4">Categoría</th>
-                  <th className="py-3.5 px-4">Proveedor</th>
-                  <th className="py-3.5 px-4 text-right">Precio</th>
-                  <th className="py-3.5 px-4 text-right">Stock</th>
-                  <th className="py-3.5 px-4 text-center">Estado</th>
-                  <th className="py-3.5 px-4 text-right">Acciones</th>
+                  <th className="py-3.5 px-3 w-[32%]">Producto</th>
+                  <th className="py-3.5 px-3 w-[12%]">Categoría</th>
+                  <th className="py-3.5 px-3 w-[13%]">Proveedor</th>
+                  <th className="py-3.5 px-3 w-[12%] text-right">Precio</th>
+                  <th className="py-3.5 px-3 w-[11%] text-right">Stock</th>
+                  <th className="py-3.5 px-3 w-[10%] text-center">Estado</th>
+                  <th className="py-3.5 px-4 w-[10%] text-right">Acciones</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100 bg-white">
@@ -279,27 +305,23 @@ export default function ProductosPage() {
 
                   return (
                     <tr key={p.id} className="hover:bg-slate-50/80 transition-colors duration-150 group">
-                      {/* Checkbox oculto en reposo, aparece en hover */}
-                      <td className="py-3.5 px-4 text-center align-middle">
+                      {/* Checkbox */}
+                      <td className="py-3.5 px-3 text-center align-middle">
                         <input
                           type="checkbox"
                           className="w-3.5 h-3.5 rounded border-slate-300 text-orange-600 focus:ring-orange-500 cursor-pointer opacity-0 group-hover:opacity-100 transition-opacity duration-150"
                         />
                       </td>
 
-                      {/* Columna Producto (48x48px Foto Unsplash Real) */}
-                      <td className="py-3.5 px-4 align-middle">
-                        <div className="flex items-center gap-3.5">
-                          <img
-                            src={p.foto_url || 'https://images.unsplash.com/photo-1527443224154-c4a3942d3acf?w=300&auto=format&fit=crop&q=80'}
-                            alt={p.nombre}
-                            className="w-12 h-12 rounded-xl object-cover border border-slate-200/80 shrink-0 shadow-2xs bg-slate-50"
-                          />
+                      {/* Columna Producto */}
+                      <td className="py-3.5 px-3 align-middle">
+                        <div className="flex items-center gap-3">
+                          <ProductImage src={p.foto_url} nombre={p.nombre} />
                           <div className="min-w-0">
                             <p className="font-semibold text-slate-900 text-xs sm:text-sm truncate group-hover:text-orange-600 transition-colors">
                               {p.nombre}
                             </p>
-                            <p className="text-[11px] text-slate-500 font-mono mt-0.5">
+                            <p className="text-[11px] text-slate-500 font-mono mt-0.5 truncate">
                               SKU: {p.codigo}{p.codigo_barras ? ` · ${p.codigo_barras}` : ''}
                             </p>
                           </div>
@@ -307,9 +329,9 @@ export default function ProductosPage() {
                       </td>
 
                       {/* Categoría Badge */}
-                      <td className="py-3.5 px-4 align-middle font-medium whitespace-nowrap">
+                      <td className="py-3.5 px-3 align-middle font-medium whitespace-nowrap">
                         {p.categoria_nombre ? (
-                          <span className="inline-flex items-center px-2.5 py-1 rounded-md text-xs font-semibold bg-slate-100 text-slate-700 border border-slate-200/70">
+                          <span className="inline-flex items-center px-2 py-0.5 rounded-md text-xs font-semibold bg-slate-100 text-slate-700 border border-slate-200/70">
                             {p.categoria_nombre}
                           </span>
                         ) : (
@@ -318,20 +340,20 @@ export default function ProductosPage() {
                       </td>
 
                       {/* Proveedor */}
-                      <td className="py-3.5 px-4 align-middle font-medium text-slate-600 whitespace-nowrap">
+                      <td className="py-3.5 px-3 align-middle font-medium text-slate-600 whitespace-nowrap">
                         {p.proveedor_nombre || '—'}
                       </td>
 
                       {/* Precio */}
-                      <td className="py-3.5 px-4 align-middle text-right whitespace-nowrap">
+                      <td className="py-3.5 px-3 align-middle text-right whitespace-nowrap">
                         <p className="font-bold text-slate-900 text-xs sm:text-sm">
                           ${Number(p.precio_unitario).toLocaleString('es-MX', { minimumFractionDigits: 2 })}
                         </p>
                         <p className="text-[10px] text-slate-400 font-medium">MXN / {p.unidad_medida}</p>
                       </td>
 
-                      {/* Stock (Sistema de Línea Única Limpia) */}
-                      <td className="py-3.5 px-4 align-middle text-right whitespace-nowrap">
+                      {/* Stock */}
+                      <td className="py-3.5 px-3 align-middle text-right whitespace-nowrap">
                         <p className={`font-semibold text-xs sm:text-sm ${bajoStock ? 'text-amber-700 font-bold' : 'text-slate-800'}`}>
                           {p.stock_total} unidades
                         </p>
@@ -340,22 +362,22 @@ export default function ProductosPage() {
                         </p>
                       </td>
 
-                      {/* Estado Sobrio (Status Dot de 6px + Texto Limpio) */}
-                      <td className="py-3.5 px-4 align-middle text-center whitespace-nowrap">
+                      {/* Estado Sobrio */}
+                      <td className="py-3.5 px-3 align-middle text-center whitespace-nowrap">
                         {bajoStock ? (
-                          <div className="inline-flex items-center justify-center gap-1.5 px-2.5 py-0.5">
+                          <div className="inline-flex items-center justify-center gap-1.5 px-2 py-0.5">
                             <span className="w-1.5 h-1.5 rounded-full bg-amber-500 shrink-0" />
                             <span className="text-amber-700 text-xs font-medium">Bajo Stock</span>
                           </div>
                         ) : (
-                          <div className="inline-flex items-center justify-center gap-1.5 px-2.5 py-0.5">
+                          <div className="inline-flex items-center justify-center gap-1.5 px-2 py-0.5">
                             <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 shrink-0" />
                             <span className="text-slate-700 text-xs font-medium">Disponible</span>
                           </div>
                         )}
                       </td>
 
-                      {/* Acciones con Menú Desplegable de 3 Puntos */}
+                      {/* Acciones Completa Visibilidad */}
                       <td className="py-3.5 px-4 align-middle text-right whitespace-nowrap relative">
                         <div className="inline-flex items-center gap-1.5 justify-end">
                           {puedeEditar && (
@@ -520,8 +542,20 @@ export default function ProductosPage() {
           </div>
 
           <div className="flex justify-end gap-2.5 pt-4 border-t border-slate-200">
-            <Button type="button" variant="secondary" onClick={cerrarModal}>Cancelar</Button>
-            <Button type="submit" disabled={guardando}>{guardando ? 'Guardando...' : 'Guardar'}</Button>
+            <button
+              type="button"
+              onClick={cerrarModal}
+              className="px-4 py-2 bg-white border border-slate-300 hover:bg-slate-50 text-slate-700 font-semibold rounded-xl text-xs sm:text-sm cursor-pointer transition-colors"
+            >
+              Cancelar
+            </button>
+            <button
+              type="submit"
+              disabled={guardando}
+              className="px-5 py-2 bg-gradient-to-r from-orange-600 to-amber-600 hover:from-orange-700 hover:to-amber-700 text-white font-bold rounded-xl text-xs sm:text-sm shadow-xs shadow-orange-950/20 active:scale-[0.98] transition-all cursor-pointer disabled:opacity-50"
+            >
+              {guardando ? 'Guardando...' : 'Guardar Producto'}
+            </button>
           </div>
         </form>
       </Modal>
