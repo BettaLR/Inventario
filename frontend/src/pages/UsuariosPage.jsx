@@ -19,16 +19,14 @@ const schema = Yup.object({
 
 const emptyUsuario = { nombre: '', email: '', password: '', rol_id: '2' };
 
-// Componente Badge de Rol Inspirado Fielmente en el Boceto
+// Componente Badge de Rol Fino, Recto, Liso y Cotidiano (Estilo Stripe / Vercel)
 function RoleBadge({ rol }) {
   const r = (rol || '').toLowerCase();
 
   if (r.includes('admin')) {
     return (
-      <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-xl text-xs font-semibold bg-purple-50 text-purple-700 border border-purple-100">
-        <svg className="w-3.5 h-3.5 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.8" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
-        </svg>
+      <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-semibold bg-slate-100 text-slate-700 border border-slate-200/80 whitespace-nowrap">
+        <span className="w-1.5 h-1.5 rounded-full bg-purple-500 shrink-0" />
         <span>Administrador</span>
       </span>
     );
@@ -36,20 +34,16 @@ function RoleBadge({ rol }) {
 
   if (r.includes('almacen')) {
     return (
-      <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-xl text-xs font-semibold bg-blue-50 text-blue-700 border border-blue-100">
-        <svg className="w-3.5 h-3.5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.8" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
-        </svg>
+      <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-semibold bg-slate-100 text-slate-700 border border-slate-200/80 whitespace-nowrap">
+        <span className="w-1.5 h-1.5 rounded-full bg-blue-500 shrink-0" />
         <span>Almacenista</span>
       </span>
     );
   }
 
   return (
-    <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-xl text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-100">
-      <svg className="w-3.5 h-3.5 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.8" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-      </svg>
+    <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-semibold bg-slate-100 text-slate-700 border border-slate-200/80 whitespace-nowrap">
+      <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 shrink-0" />
       <span>Cliente</span>
     </span>
   );
@@ -130,7 +124,7 @@ export default function UsuariosPage() {
 
   return (
     <div className="space-y-6 pb-8 font-sans w-full">
-      {/* 1. Header Principal Estilo Boceto (Título + Subtítulo + Botón "+ Agregar usuario") */}
+      {/* 1. Header Principal (Título + Subtítulo + Botón "+ Agregar usuario") */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <h1 className="text-2xl font-extrabold text-slate-900 tracking-tight font-heading">Usuarios</h1>
@@ -139,7 +133,7 @@ export default function UsuariosPage() {
           </p>
         </div>
 
-        {/* Botón "+ Agregar usuario" en Alto Contraste Oscuro Corporativo */}
+        {/* Botón "+ Agregar usuario" */}
         <button
           onClick={abrirNuevo}
           className="bg-[#111827] hover:bg-[#1f2937] text-white font-bold py-2.5 px-4 rounded-xl text-xs sm:text-sm shadow-xs active:scale-[0.98] transition-all cursor-pointer flex items-center gap-2 shrink-0"
@@ -151,7 +145,7 @@ export default function UsuariosPage() {
         </button>
       </div>
 
-      {/* 2. Contenedor Tarjeta Blanca Limpia (Card Container) */}
+      {/* 2. Contenedor Tarjeta Blanca Limpia */}
       <div className="bg-white rounded-2xl border border-slate-200/80 shadow-2xs p-5 sm:p-6 space-y-4">
         
         {/* Buscador Superior Izquierdo Integrado */}
@@ -167,7 +161,7 @@ export default function UsuariosPage() {
           </svg>
         </div>
 
-        {/* 3. Tabla Maquetada Fiel al Boceto */}
+        {/* 3. Tabla Maquetada con Badges Finos, Rectos y Lisos */}
         <div className="border border-slate-200/80 rounded-xl overflow-hidden bg-white">
           {isLoading ? (
             <div className="py-20 flex justify-center"><Spinner /></div>
@@ -193,7 +187,7 @@ export default function UsuariosPage() {
 
                     return (
                       <tr key={u.id} className="hover:bg-slate-50/80 transition-colors duration-150 group">
-                        {/* Columna USUARIO: Avatar Circular Gris + Nombre en Negrita */}
+                        {/* Columna USUARIO */}
                         <td className="py-3.5 px-4 align-middle whitespace-nowrap">
                           <div className="flex items-center gap-3">
                             <div className="w-9 h-9 rounded-full bg-slate-100 text-slate-600 font-bold text-xs border border-slate-200/60 flex items-center justify-center shrink-0 shadow-2xs">
@@ -210,12 +204,12 @@ export default function UsuariosPage() {
                           {u.email}
                         </td>
 
-                        {/* Columna ROL: Soft Badge Con Icono (Almacenista/Cliente/Administrador) */}
+                        {/* Columna ROL: Badge Fino, Recto y Liso */}
                         <td className="py-3.5 px-4 align-middle whitespace-nowrap">
                           <RoleBadge rol={u.rol} />
                         </td>
 
-                        {/* Columna ESTADO: Status Dot Verde de 6px + Activo */}
+                        {/* Columna ESTADO */}
                         <td className="py-3.5 px-4 align-middle text-center whitespace-nowrap">
                           <div className="inline-flex items-center justify-center gap-1.5">
                             <span className={`w-1.5 h-1.5 rounded-full shrink-0 ${esActivo ? 'bg-emerald-500' : 'bg-slate-400'}`} />
@@ -225,7 +219,7 @@ export default function UsuariosPage() {
                           </div>
                         </td>
 
-                        {/* Columna ACCIONES: Icono Lápiz ✏️ + Desplegable 3 Puntos ... */}
+                        {/* Columna ACCIONES */}
                         <td className="py-3.5 px-4 align-middle text-right whitespace-nowrap relative">
                           <div className="inline-flex items-center gap-1.5 justify-end">
                             <button
@@ -293,7 +287,7 @@ export default function UsuariosPage() {
           )}
         </div>
 
-        {/* 4. Footer de Paginación Fiel al Boceto */}
+        {/* 4. Footer de Paginación */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-2 text-xs text-slate-500 font-medium">
           <p>
             Mostrando 1 a {usuariosFiltrados.length} de {usuariosFiltrados.length} usuarios

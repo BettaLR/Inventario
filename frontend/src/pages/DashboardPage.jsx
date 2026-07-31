@@ -115,7 +115,6 @@ export default function DashboardPage() {
             <div className="bg-white border border-slate-200 rounded-sm shadow-xs overflow-hidden">
               <div className="px-4 py-2.5 bg-slate-50 border-b border-slate-200 flex items-center justify-between">
                 <div className="flex items-center gap-2 text-xs font-bold text-slate-700">
-                  <span>🛒</span>
                   <span>Producto más Vendido (Entradas / Stock)</span>
                 </div>
                 <div className="flex items-center gap-2 text-slate-400 text-xs font-mono">
@@ -140,7 +139,6 @@ export default function DashboardPage() {
             <div className="bg-white border border-slate-200 rounded-sm shadow-xs overflow-hidden">
               <div className="px-4 py-2.5 bg-slate-50 border-b border-slate-200 flex items-center justify-between">
                 <div className="flex items-center gap-2 text-xs font-bold text-slate-700">
-                  <span>🛒</span>
                   <span>Distribución de Productos por Categoria</span>
                 </div>
                 <div className="flex items-center gap-2 text-slate-400 text-xs font-mono">
@@ -165,7 +163,6 @@ export default function DashboardPage() {
             <div className="bg-white border border-slate-200 rounded-sm shadow-xs overflow-hidden">
               <div className="px-4 py-2.5 bg-slate-50 border-b border-slate-200 flex items-center justify-between">
                 <div className="flex items-center gap-2 text-xs font-bold text-slate-700">
-                  <span>📊</span>
                   <span>Movimientos Realizados - Últimos 7 Días</span>
                 </div>
                 <div className="flex items-center gap-2 text-slate-400 text-xs font-mono">
@@ -197,7 +194,6 @@ export default function DashboardPage() {
             <div className="bg-white border border-slate-200 rounded-sm shadow-xs overflow-hidden">
               <div className="px-4 py-2.5 bg-slate-50 border-b border-slate-200 flex items-center justify-between">
                 <div className="flex items-center gap-2 text-xs font-bold text-slate-700">
-                  <span>📊</span>
                   <span>Movimientos Registrados Vrs Stock Disponible</span>
                 </div>
                 <div className="flex items-center gap-2 text-slate-400 text-xs font-mono">
