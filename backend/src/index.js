@@ -14,8 +14,17 @@ const usuariosRoutes = require('./routes/usuariosRoutes');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
+const allowedOrigins = (process.env.FRONTEND_URL || 'http://localhost:5173')
+  .split(',')
+  .map((origin) => origin.trim());
+
 app.use(cors({
-  origin: '*',
+  origin: (origin, callback) => {
+    if (!origin || allowedOrigins.includes(origin)) {
+      return callback(null, true);
+    }
+    return callback(new Error('No permitido por CORS'));
+  },
   credentials: true,
 }));
 
@@ -55,6 +64,10 @@ if (require.main === module) {
     console.log(`Servidor corriendo en http://localhost:${PORT}`);
     console.log(`Entorno: ${process.env.NODE_ENV || 'development'}`);
   });
+
+  const cron = require('node-cron');
+  const { respaldar } = require('../scripts/backup-db');
+  cron.schedule('0 3 * * *', respaldar); // respaldo diario 3:00 AM
 }
 
 module.exports = app;

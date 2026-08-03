@@ -5,15 +5,18 @@ import {
 import { useNavigate } from 'react-router-dom';
 import { obtenerStats } from '../services/dashboardService';
 import Spinner from '../components/ui/Spinner';
+import EmptyState from '../components/ui/EmptyState';
 
 export default function DashboardPage() {
   const navigate = useNavigate();
-  const { data, isLoading } = useQuery({ queryKey: ['dashboard-stats'], queryFn: obtenerStats });
+  const { data, isLoading, isError } = useQuery({ queryKey: ['dashboard-stats'], queryFn: obtenerStats });
 
   return (
     <div className="space-y-6 select-none">
       {isLoading ? (
         <Spinner />
+      ) : isError || !data ? (
+        <EmptyState title="No se pudo cargar el dashboard" subtitle="Verifica que el servidor esté disponible e intenta de nuevo." />
       ) : (
         <>
           {/* 4 Solid Action Metric Cards */}

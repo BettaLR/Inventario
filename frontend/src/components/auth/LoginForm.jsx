@@ -7,14 +7,7 @@ import { useState } from 'react';
 const schema = Yup.object({
   email: Yup.string().email('Email inválido').required('El email es requerido'),
   password: Yup.string().required('La contraseña es requerida'),
-  modelo: Yup.string(),
 });
-
-const DEMO_ROLES = [
-  { label: 'Admin', email: 'admin@inventario.com', modelo: 'MODELO_ADMIN_v2' },
-  { label: 'Almacén', email: 'almacen@inventario.com', modelo: 'MODELO_WMS_OPER' },
-  { label: 'Cliente', email: 'cliente@inventario.com', modelo: 'MODELO_CLIENT_VIP' },
-];
 
 export default function LoginForm() {
   const { login } = useAuth();
@@ -23,7 +16,7 @@ export default function LoginForm() {
   const [rememberMe, setRememberMe] = useState(true);
 
   const formik = useFormik({
-    initialValues: { email: 'almacen@inventario.com', password: 'Admin123!', modelo: 'MODELO_SPECIFIC_ID' },
+    initialValues: { email: '', password: '' },
     validationSchema: schema,
     onSubmit: async (values, { setSubmitting }) => {
       setErrorServidor('');
@@ -38,12 +31,6 @@ export default function LoginForm() {
       }
     },
   });
-
-  const selectRole = (role) => {
-    formik.setFieldValue('email', role.email);
-    formik.setFieldValue('password', 'Admin123!');
-    formik.setFieldValue('modelo', role.modelo);
-  };
 
   return (
     <div
@@ -73,24 +60,6 @@ export default function LoginForm() {
           <p className="text-white/50 text-[11px] font-medium tracking-wide mt-0.5">
             Control de Inventarios WMS
           </p>
-        </div>
-
-        {/* Role Selector Capsule */}
-        <div className="flex items-center justify-between p-1 bg-white/[0.06] backdrop-blur-md rounded-full border border-white/10">
-          {DEMO_ROLES.map((r) => (
-            <button
-              key={r.email}
-              type="button"
-              onClick={() => selectRole(r)}
-              className={`flex-1 py-1.5 px-2 rounded-full text-[11px] font-semibold transition-all duration-300 cursor-pointer text-center ${
-                formik.values.email === r.email
-                  ? 'bg-gradient-to-r from-pink-500 via-purple-500 to-indigo-500 text-white shadow-lg shadow-pink-500/30 font-bold scale-[1.02]'
-                  : 'text-white/60 hover:text-white hover:bg-white/5'
-              }`}
-            >
-              {r.label}
-            </button>
-          ))}
         </div>
 
         {/* Minimalist Line Form */}
@@ -133,22 +102,6 @@ export default function LoginForm() {
             {formik.touched.password && formik.errors.password && (
               <p className="text-pink-400 text-[11px] mt-1 font-medium">{formik.errors.password}</p>
             )}
-          </div>
-
-          {/* Modelo */}
-          <div>
-            <div className="flex items-center gap-3 border-b border-white/20 focus-within:border-pink-400 py-2 transition-colors">
-              <svg className="w-4 h-4 text-white/60 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.8" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
-              </svg>
-              <input
-                id="modelo"
-                type="text"
-                className="w-full bg-transparent text-white placeholder-white/30 text-sm font-normal outline-none border-none focus:ring-0 p-0"
-                placeholder="MODELO ESPECÍFICO"
-                {...formik.getFieldProps('modelo')}
-              />
-            </div>
           </div>
 
           {/* Options Row */}

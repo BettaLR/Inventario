@@ -2,12 +2,14 @@ const { query, getClient } = require('../config/db');
 
 const LIST_SELECT = `
   SELECT m.*, p.nombre AS producto_nombre, p.codigo AS producto_codigo,
-    a.nombre AS almacen_nombre, ad.nombre AS almacen_destino_nombre, u.nombre AS usuario_nombre
+    a.nombre AS almacen_nombre, ad.nombre AS almacen_destino_nombre, u.nombre AS usuario_nombre,
+    pr.nombre AS proveedor_nombre
   FROM movimientos m
   JOIN productos p ON p.id = m.producto_id
   JOIN almacenes a ON a.id = m.almacen_id
   LEFT JOIN almacenes ad ON ad.id = m.almacen_destino_id
   JOIN usuarios u ON u.id = m.usuario_id
+  LEFT JOIN proveedores pr ON pr.id = m.proveedor_id
 `;
 
 const listar = async (req, res) => {
@@ -46,7 +48,7 @@ const obtenerOCrearStock = async (client, producto_id, almacen_id) => {
 const registrarMovimiento = async (req, res) => {
   const {
     producto_id, almacen_id, almacen_destino_id, tipo, cantidad, cantidad_nueva: cantidadNuevaAjuste,
-    motivo, referencia,
+    motivo, referencia, proveedor_id,
   } = req.body;
 
   if (!['entrada', 'salida', 'ajuste', 'transferencia', 'devolucion'].includes(tipo)) {
@@ -89,11 +91,12 @@ const registrarMovimiento = async (req, res) => {
 
     const movimiento = await client.query(
       `INSERT INTO movimientos
-        (producto_id, almacen_id, almacen_destino_id, usuario_id, tipo, cantidad, cantidad_anterior, cantidad_nueva, motivo, referencia)
-       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10) RETURNING *`,
+        (producto_id, almacen_id, almacen_destino_id, usuario_id, proveedor_id, tipo, cantidad, cantidad_anterior, cantidad_nueva, motivo, referencia)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11) RETURNING *`,
       [
         producto_id, almacen_id, tipo === 'transferencia' ? almacen_destino_id : null,
-        req.user.id, tipo, cantidadMovimiento, anterior, nuevaOrigen, motivo || null, referencia || null,
+        req.user.id, tipo === 'entrada' ? (proveedor_id || null) : null,
+        tipo, cantidadMovimiento, anterior, nuevaOrigen, motivo || null, referencia || null,
       ]
     );
 
@@ -113,4 +116,26 @@ const registrarMovimiento = async (req, res) => {
   }
 };
 
-module.exports = { listar, registrarMovimiento };
+const actualizarUbicacion = async (req, res) => {
+  const { producto_id, almacen_id } = req.params;
+  const { ubicacion } = req.body;
+
+  const client = await getClient();
+  try {
+    await client.query('BEGIN');
+    const stock = await obtenerOCrearStock(client, producto_id, almacen_id);
+    const result = await client.query(
+      'UPDATE stock SET ubicacion = $1, updated_at = CURRENT_TIMESTAMP WHERE id = $2 RETURNING *',
+      [ubicacion || null, stock.id]
+    );
+    await client.query('COMMIT');
+    res.json(result.rows[0]);
+  } catch (err) {
+    await client.query('ROLLBACK');
+    throw err;
+  } finally {
+    client.release();
+  }
+};
+
+module.exports = { listar, registrarMovimiento, actualizarUbicacion };

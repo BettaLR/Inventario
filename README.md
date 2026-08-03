@@ -35,6 +35,13 @@ psql -U postgres -d inventario_db -f backend/database/seeds.sql
 > ```bash
 > psql -U postgres -d inventario_db -f backend/database/migration_sprint2.sql
 > ```
+>
+> Si ya tenías la base de datos creada antes del Sprint 3 (proveedor en movimientos de entrada + auditoría), aplica:
+> ```bash
+> psql -U postgres -d inventario_db -f backend/database/migration_sprint3.sql
+> ```
+
+> **Nota:** la base de datos es PostgreSQL. Un cambio temporal a SQLite embebido (pensado para simplificar el deploy en Vercel) se revirtió porque rompía el bloqueo de fila (`FOR UPDATE`) que protege el stock ante movimientos concurrentes y varias queries con comparaciones `boolean = integer` que no son válidas en Postgres. Para desplegar en Vercel, usa una instancia Postgres administrada (Neon, Supabase, etc.) y configura sus credenciales como variables de entorno.
 
 ### 2. Backend
 
@@ -55,16 +62,23 @@ npm run dev               # Corre en http://localhost:5173
 
 ## Usuarios de prueba (seeds)
 
-| Email                    | Password   | Rol          |
-|--------------------------|------------|--------------|
-| erick@inventario.com     | password   | Admin        |
-| pedro@inventario.com     | password   | Gerente      |
-| manuel@inventario.com    | password   | Gerente      |
-| ana@inventario.com       | password   | Almacenista  |
-| carlos@inventario.com    | password   | Almacenista  |
+| Email                      | Password    | Rol            |
+|-----------------------------|-------------|----------------|
+| admin@inventario.com       | Admin123!   | Administrador  |
+| almacen@inventario.com     | Admin123!   | Almacenista    |
+| cliente@inventario.com     | Admin123!   | Cliente        |
 
-> **Nota:** El hash en seeds.sql es `password`. Antes de producción, regenerar con bcrypt.
+> **Nota:** Antes de producción, regenerar los hashes de seeds.sql con contraseñas propias.
 
+## Respaldo de la base de datos
+
+```bash
+cd backend
+npm run db:backup        # respaldo manual con pg_dump a backend/database/backups/
+```
+
+Mientras el servidor corre como proceso persistente (`npm run dev` / `npm start`), un job interno (`node-cron`) ejecuta este mismo respaldo todos los días a las 3:00 AM y conserva los últimos 14 días. En despliegues serverless (Vercel) este cron no aplica — usa el respaldo automático que ofrezca tu proveedor de Postgres administrado (Neon, Supabase, etc.).
+w
 ## Endpoints disponibles
 
 | Método | Ruta                                      | Auth  | Descripción                          |

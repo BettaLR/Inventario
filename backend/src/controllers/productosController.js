@@ -1,4 +1,5 @@
 const { query } = require('../config/db');
+const { registrarAuditoria } = require('../utils/auditoria');
 
 const BASE_SELECT = `
   SELECT p.*, c.nombre AS categoria_nombre, pr.nombre AS proveedor_nombre,
@@ -49,7 +50,7 @@ const obtener = async (req, res) => {
   if (result.rows.length === 0) return res.status(404).json({ message: 'Producto no encontrado' });
 
   const stockPorAlmacen = await query(
-    `SELECT s.almacen_id, a.nombre AS almacen_nombre, s.cantidad
+    `SELECT s.almacen_id, a.nombre AS almacen_nombre, s.cantidad, s.ubicacion
      FROM stock s JOIN almacenes a ON a.id = s.almacen_id
      WHERE s.producto_id = $1 ORDER BY a.nombre`,
     [id]
@@ -76,6 +77,7 @@ const crear = async (req, res) => {
         precio_unitario || 0, stock_minimo || 0,
       ]
     );
+    await registrarAuditoria(req, 'productos', result.rows[0].id, 'crear', { codigo, nombre });
     res.status(201).json(result.rows[0]);
   } catch (err) {
     if (err.code === '23505') {
@@ -106,6 +108,7 @@ const actualizar = async (req, res) => {
       ]
     );
     if (result.rows.length === 0) return res.status(404).json({ message: 'Producto no encontrado' });
+    await registrarAuditoria(req, 'productos', id, 'actualizar', { codigo, nombre });
     res.json(result.rows[0]);
   } catch (err) {
     if (err.code === '23505') {
@@ -119,6 +122,7 @@ const eliminar = async (req, res) => {
   const { id } = req.params;
   const result = await query('UPDATE productos SET activo = false WHERE id = $1 RETURNING id', [id]);
   if (result.rows.length === 0) return res.status(404).json({ message: 'Producto no encontrado' });
+  await registrarAuditoria(req, 'productos', id, 'eliminar');
   res.json({ message: 'Producto desactivado' });
 };
 
@@ -126,7 +130,15 @@ const buscarPorCodigoBarras = async (req, res) => {
   const { codigo } = req.params;
   const result = await query(`${BASE_SELECT} WHERE p.codigo_barras = $1 OR p.codigo = $1 ${GROUP_BY}`, [codigo]);
   if (result.rows.length === 0) return res.status(404).json({ message: 'Producto no encontrado' });
-  res.json(result.rows[0]);
+
+  const stockPorAlmacen = await query(
+    `SELECT s.almacen_id, a.nombre AS almacen_nombre, s.cantidad, s.ubicacion
+     FROM stock s JOIN almacenes a ON a.id = s.almacen_id
+     WHERE s.producto_id = $1 ORDER BY a.nombre`,
+    [result.rows[0].id]
+  );
+
+  res.json({ ...result.rows[0], stockPorAlmacen: stockPorAlmacen.rows });
 };
 
 module.exports = { listar, obtener, crear, actualizar, eliminar, buscarPorCodigoBarras };

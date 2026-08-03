@@ -4,6 +4,7 @@
 -- ============================================
 
 -- Limpiar si ya existen las tablas (orden inverso por FK)
+DROP TABLE IF EXISTS auditoria CASCADE;
 DROP TABLE IF EXISTS movimientos CASCADE;
 DROP TABLE IF EXISTS stock CASCADE;
 DROP TABLE IF EXISTS productos CASCADE;
@@ -111,6 +112,7 @@ CREATE TABLE stock (
   producto_id INTEGER NOT NULL REFERENCES productos(id),
   almacen_id INTEGER NOT NULL REFERENCES almacenes(id),
   cantidad INTEGER NOT NULL DEFAULT 0 CHECK (cantidad >= 0),
+  ubicacion VARCHAR(50),
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   UNIQUE(producto_id, almacen_id)
 );
@@ -127,6 +129,7 @@ CREATE TABLE movimientos (
   almacen_id INTEGER NOT NULL REFERENCES almacenes(id),
   almacen_destino_id INTEGER REFERENCES almacenes(id),
   usuario_id INTEGER NOT NULL REFERENCES usuarios(id),
+  proveedor_id INTEGER REFERENCES proveedores(id),
   tipo VARCHAR(15) NOT NULL CHECK (tipo IN ('entrada', 'salida', 'ajuste', 'transferencia', 'devolucion')),
   cantidad INTEGER NOT NULL CHECK (cantidad > 0),
   cantidad_anterior INTEGER NOT NULL,
@@ -139,8 +142,28 @@ CREATE TABLE movimientos (
 CREATE INDEX idx_movimientos_producto_id ON movimientos(producto_id);
 CREATE INDEX idx_movimientos_almacen_id ON movimientos(almacen_id);
 CREATE INDEX idx_movimientos_usuario_id ON movimientos(usuario_id);
+CREATE INDEX idx_movimientos_proveedor_id ON movimientos(proveedor_id);
 CREATE INDEX idx_movimientos_created_at ON movimientos(created_at DESC);
 CREATE INDEX idx_movimientos_tipo ON movimientos(tipo);
+
+-- ============================================
+-- TABLA 9: auditoria
+-- Registra quién hizo cada cambio de CRUD sobre los catálogos
+-- (los movimientos de Kardex ya se auditan vía movimientos.usuario_id)
+-- ============================================
+CREATE TABLE auditoria (
+  id SERIAL PRIMARY KEY,
+  usuario_id INTEGER REFERENCES usuarios(id),
+  entidad VARCHAR(50) NOT NULL,
+  entidad_id INTEGER NOT NULL,
+  accion VARCHAR(10) NOT NULL CHECK (accion IN ('crear', 'actualizar', 'eliminar')),
+  detalle JSONB,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE INDEX idx_auditoria_entidad ON auditoria(entidad, entidad_id);
+CREATE INDEX idx_auditoria_usuario_id ON auditoria(usuario_id);
+CREATE INDEX idx_auditoria_created_at ON auditoria(created_at DESC);
 
 -- ============================================
 -- FUNCIÓN: actualizar updated_at automáticamente

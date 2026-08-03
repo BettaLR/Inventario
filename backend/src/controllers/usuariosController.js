@@ -1,5 +1,6 @@
 const bcrypt = require('bcryptjs');
 const { query } = require('../config/db');
+const { registrarAuditoria } = require('../utils/auditoria');
 
 const listar = async (req, res) => {
   const result = await query(
@@ -26,9 +27,10 @@ const crear = async (req, res) => {
 
   const result = await query(
     `INSERT INTO usuarios (nombre, email, password_hash, rol_id, activo)
-     VALUES ($1, $2, $3, $4, 1) RETURNING id, nombre, email, activo`,
+     VALUES ($1, $2, $3, $4, true) RETURNING id, nombre, email, activo`,
     [nombre, email, hash, rolId]
   );
+  await registrarAuditoria(req, 'usuarios', result.rows[0].id, 'crear', { nombre, email });
   res.status(201).json(result.rows[0]);
 };
 
@@ -40,6 +42,7 @@ const actualizarEstado = async (req, res) => {
     [activo, id]
   );
   if (result.rows.length === 0) return res.status(404).json({ message: 'Usuario no encontrado' });
+  await registrarAuditoria(req, 'usuarios', id, 'actualizar', { activo });
   res.json(result.rows[0]);
 };
 

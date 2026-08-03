@@ -12,6 +12,8 @@ import KardexPage from './pages/KardexPage';
 import ReportesPage from './pages/ReportesPage';
 import UsuariosPage from './pages/UsuariosPage';
 import NoAutorizadoPage from './pages/NoAutorizadoPage';
+import EscanearPage from './pages/EscanearPage';
+import ProductoEscaneadoPage from './pages/ProductoEscaneadoPage';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -38,6 +40,10 @@ export default function App() {
                 <Route path="/reportes" element={<ReportesPage />} />
                 <Route path="/usuarios" element={<UsuariosPage />} />
               </Route>
+
+              {/* Módulo de escaneo móvil: pantalla completa, sin chrome de escritorio */}
+              <Route path="/escanear" element={<EscanearPage />} />
+              <Route path="/escanear/producto/:codigo" element={<ProductoEscaneadoPage />} />
             </Route>
 
             <Route path="/" element={<Navigate to="/dashboard" replace />} />

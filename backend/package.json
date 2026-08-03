@@ -9,7 +9,8 @@
     "test": "jest --coverage",
     "test:watch": "jest --watch",
     "db:schema": "psql -U postgres -d inventario_db -f database/schema.sql",
-    "db:seeds": "psql -U postgres -d inventario_db -f database/seeds.sql"
+    "db:seeds": "psql -U postgres -d inventario_db -f database/seeds.sql",
+    "db:backup": "node scripts/backup-db.js"
   },
   "dependencies": {
     "bcryptjs": "^2.4.3",
@@ -19,9 +20,9 @@
     "express": "^4.19.2",
     "express-validator": "^7.1.0",
     "jsonwebtoken": "^9.0.2",
+    "node-cron": "^3.0.3",
     "pdfkit": "^0.19.1",
-    "pg": "^8.12.0",
-    "sqlite3": "^6.0.1"
+    "pg": "^8.12.0"
   },
   "devDependencies": {
     "jest": "^29.7.0",

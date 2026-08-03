@@ -24,4 +24,13 @@ router.post(
   asyncHandler(ctrl.registrarMovimiento)
 );
 
+router.put(
+  '/stock/:producto_id/:almacen_id/ubicacion',
+  [
+    body('ubicacion').optional({ nullable: true }).isString().isLength({ max: 50 }).withMessage('Ubicación inválida'),
+    handleValidationErrors,
+  ],
+  asyncHandler(ctrl.actualizarUbicacion)
+);
+
 module.exports = router;

@@ -6,6 +6,7 @@ import * as Yup from 'yup';
 import { listarMovimientos, registrarMovimiento } from '../services/movimientosService';
 import { listarProductos, buscarPorCodigoBarras } from '../services/productosService';
 import { listarAlmacenes } from '../services/almacenesService';
+import { listarProveedores } from '../services/proveedoresService';
 import Field, { inputClass } from '../components/ui/Field';
 import Spinner from '../components/ui/Spinner';
 import EmptyState from '../components/ui/EmptyState';
@@ -78,6 +79,7 @@ export default function KardexPage() {
 
   const { data: productos } = useQuery({ queryKey: ['productos-lite'], queryFn: () => listarProductos() });
   const { data: almacenes } = useQuery({ queryKey: ['almacenes'], queryFn: listarAlmacenes });
+  const { data: proveedores } = useQuery({ queryKey: ['proveedores'], queryFn: () => listarProveedores() });
   const { data: movimientos, isLoading } = useQuery({
     queryKey: ['movimientos', filtroProducto, filtroTipo],
     queryFn: () => listarMovimientos({ producto_id: filtroProducto || undefined, tipo: filtroTipo || undefined }),
@@ -96,7 +98,7 @@ export default function KardexPage() {
 
   const formik = useFormik({
     initialValues: {
-      producto_id: '', almacen_id: '', almacen_destino_id: '', tipo: 'entrada',
+      producto_id: '', almacen_id: '', almacen_destino_id: '', proveedor_id: '', tipo: 'entrada',
       cantidad: '', cantidad_nueva: '', motivo: '', referencia: '',
     },
     validationSchema: Yup.object({
@@ -127,6 +129,7 @@ export default function KardexPage() {
       if (values.tipo === 'ajuste') payload.cantidad_nueva = Number(values.cantidad_nueva);
       else payload.cantidad = Number(values.cantidad);
       if (values.tipo === 'transferencia') payload.almacen_destino_id = Number(values.almacen_destino_id);
+      if (values.tipo === 'entrada' && values.proveedor_id) payload.proveedor_id = Number(values.proveedor_id);
       registrarMutation.mutate(payload);
     },
   });
@@ -246,6 +249,16 @@ export default function KardexPage() {
                   {almacenes?.filter((a) => String(a.id) !== String(formik.values.almacen_id)).map((a) => (
                     <option key={a.id} value={a.id}>{a.nombre}</option>
                   ))}
+                </select>
+              </Field>
+            )}
+
+            {/* Proveedor si es Entrada */}
+            {formik.values.tipo === 'entrada' && (
+              <Field label="Proveedor">
+                <select className={inputClass(false)} {...formik.getFieldProps('proveedor_id')}>
+                  <option value="">Seleccionar proveedor...</option>
+                  {proveedores?.map((p) => <option key={p.id} value={p.id}>{p.nombre}</option>)}
                 </select>
               </Field>
             )}

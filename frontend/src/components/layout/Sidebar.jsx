@@ -1,4 +1,4 @@
-import { NavLink } from 'react-router-dom';
+import { NavLink, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 
 function Icon({ name }) {
@@ -34,6 +34,11 @@ function Icon({ name }) {
         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
       </svg>
     ),
+    escanear: (
+      <svg className="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 7V5a1 1 0 011-1h2M4 17v2a1 1 0 001 1h2m10-16h2a1 1 0 011 1v2m-3 14h2a1 1 0 001-1v-2M7 8h1v8H7V8zm3 0h1v8h-1V8zm3 0h2v8h-2V8zm4 0h1v8h-1V8z" />
+      </svg>
+    ),
   };
   return icons[name] || null;
 }
@@ -45,10 +50,17 @@ const navItems = [
   { to: '/catalogos',  label: 'Catálogos',             icon: 'catalogos' },
   { to: '/reportes',   label: 'Reportes',              icon: 'reportes' },
   { to: '/usuarios',   label: 'Usuarios',              icon: 'usuarios' },
+  { to: '/escanear',   label: 'Escanear QR/Código',    icon: 'escanear' },
 ];
 
 export default function Sidebar({ onCloseMobile }) {
-  const { usuario } = useAuth();
+  const { usuario, logout } = useAuth();
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    logout();
+    navigate('/login');
+  };
 
   return (
     <aside className="w-52 sm:w-56 bg-[#22272E] h-full flex flex-col shrink-0 text-slate-300 select-none border-r border-[#1C2128]">
@@ -102,6 +114,19 @@ export default function Sidebar({ onCloseMobile }) {
           </NavLink>
         ))}
       </nav>
+
+      {/* Logout */}
+      <div className="px-2 pt-1 pb-2 border-t border-[#2C333D]">
+        <button
+          onClick={handleLogout}
+          className="w-full flex items-center gap-2.5 px-3 py-2 rounded-lg font-medium text-xs text-slate-300 hover:bg-rose-500/10 hover:text-rose-400 transition-colors cursor-pointer"
+        >
+          <svg className="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+          </svg>
+          <span>Cerrar Sesión</span>
+        </button>
+      </div>
 
       {/* Sidebar Footer */}
       <div className="p-3 bg-[#1C2128] border-t border-[#2C333D] text-[10px] text-slate-500 flex justify-between items-center">

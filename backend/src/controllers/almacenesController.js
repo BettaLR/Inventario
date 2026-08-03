@@ -1,4 +1,5 @@
 const { query } = require('../config/db');
+const { registrarAuditoria } = require('../utils/auditoria');
 
 const listar = async (req, res) => {
   try {
@@ -25,6 +26,7 @@ const crear = async (req, res) => {
       `INSERT INTO almacenes (nombre, ubicacion, responsable_id) VALUES ($1, $2, $3) RETURNING *`,
       [nombre, ubicacion || null, responsable_id || null]
     );
+    await registrarAuditoria(req, 'almacenes', result.rows[0].id, 'crear', { nombre });
     res.status(201).json(result.rows[0]);
   } catch (err) {
     if (err.code === '23505') {
@@ -42,6 +44,7 @@ const actualizar = async (req, res) => {
     [nombre, ubicacion || null, responsable_id || null, activo ?? true, id]
   );
   if (result.rows.length === 0) return res.status(404).json({ message: 'Almacén no encontrado' });
+  await registrarAuditoria(req, 'almacenes', id, 'actualizar', { nombre });
   res.json(result.rows[0]);
 };
 
@@ -49,6 +52,7 @@ const eliminar = async (req, res) => {
   const { id } = req.params;
   const result = await query('UPDATE almacenes SET activo = false WHERE id = $1 RETURNING id', [id]);
   if (result.rows.length === 0) return res.status(404).json({ message: 'Almacén no encontrado' });
+  await registrarAuditoria(req, 'almacenes', id, 'eliminar');
   res.json({ message: 'Almacén desactivado' });
 };
 

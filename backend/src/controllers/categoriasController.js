@@ -1,4 +1,5 @@
 const { query } = require('../config/db');
+const { registrarAuditoria } = require('../utils/auditoria');
 
 const listar = async (req, res) => {
   const result = await query('SELECT * FROM categorias ORDER BY nombre');
@@ -12,6 +13,7 @@ const crear = async (req, res) => {
       'INSERT INTO categorias (nombre, descripcion) VALUES ($1, $2) RETURNING *',
       [nombre, descripcion || null]
     );
+    await registrarAuditoria(req, 'categorias', result.rows[0].id, 'crear', { nombre });
     res.status(201).json(result.rows[0]);
   } catch (err) {
     if (err.code === '23505') {
@@ -29,6 +31,7 @@ const actualizar = async (req, res) => {
     [nombre, descripcion || null, activo ?? true, id]
   );
   if (result.rows.length === 0) return res.status(404).json({ message: 'Categoría no encontrada' });
+  await registrarAuditoria(req, 'categorias', id, 'actualizar', { nombre });
   res.json(result.rows[0]);
 };
 
@@ -36,6 +39,7 @@ const eliminar = async (req, res) => {
   const { id } = req.params;
   const result = await query('UPDATE categorias SET activo = false WHERE id = $1 RETURNING id', [id]);
   if (result.rows.length === 0) return res.status(404).json({ message: 'Categoría no encontrada' });
+  await registrarAuditoria(req, 'categorias', id, 'eliminar');
   res.json({ message: 'Categoría desactivada' });
 };
 

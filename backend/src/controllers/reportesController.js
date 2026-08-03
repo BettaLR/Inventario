@@ -9,7 +9,7 @@ const inventarioValorizadoQuery = `
   FROM productos p
   LEFT JOIN categorias c ON c.id = p.categoria_id
   LEFT JOIN stock s ON s.producto_id = p.id
-  WHERE p.activo = 1 OR p.activo = true
+  WHERE p.activo = true
   GROUP BY p.id, c.nombre
   ORDER BY valor_total DESC
 `;
@@ -34,8 +34,8 @@ const rotacion = async (req, res) => {
          COALESCE(SUM(CASE WHEN m.tipo IN ('entrada','devolucion') THEN m.cantidad ELSE 0 END), 0) AS unidades_entrada,
          COUNT(m.id) AS total_movimientos
        FROM productos p
-       LEFT JOIN movimientos m ON m.producto_id = p.id AND DATE(m.created_at) >= DATE('now', '-' || $1 || ' days')
-       WHERE p.activo = 1 OR p.activo = true
+       LEFT JOIN movimientos m ON m.producto_id = p.id AND m.created_at >= CURRENT_DATE - ($1 || ' days')::interval
+       WHERE p.activo = true
        GROUP BY p.id
        ORDER BY unidades_salida DESC`,
       [dias]
@@ -75,7 +75,7 @@ const alertasStock = async (req, res) => {
        FROM productos p
        LEFT JOIN categorias c ON c.id = p.categoria_id
        LEFT JOIN stock s ON s.producto_id = p.id
-       WHERE p.activo = 1 OR p.activo = true
+       WHERE p.activo = true
        GROUP BY p.id, c.nombre
        HAVING COALESCE(SUM(s.cantidad), 0) <= p.stock_minimo
        ORDER BY stock_total ASC`
