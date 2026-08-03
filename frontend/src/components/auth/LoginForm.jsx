@@ -14,6 +14,7 @@ export default function LoginForm() {
   const navigate = useNavigate();
   const [errorServidor, setErrorServidor] = useState('');
   const [rememberMe, setRememberMe] = useState(true);
+  const [mostrarPassword, setMostrarPassword] = useState(false);
 
   const formik = useFormik({
     initialValues: { email: '', password: '' },
@@ -92,12 +93,30 @@ export default function LoginForm() {
               </svg>
               <input
                 id="password"
-                type="password"
+                type={mostrarPassword ? 'text' : 'password'}
                 autoComplete="current-password"
                 className="w-full bg-transparent text-white placeholder-white/30 text-sm font-normal outline-none border-none focus:ring-0 p-0"
                 placeholder="CONTRASEÑA"
                 {...formik.getFieldProps('password')}
               />
+              <button
+                type="button"
+                onClick={() => setMostrarPassword((v) => !v)}
+                className="text-white/50 hover:text-white transition-colors shrink-0 cursor-pointer"
+                aria-label={mostrarPassword ? 'Ocultar contraseña' : 'Mostrar contraseña'}
+                tabIndex={-1}
+              >
+                {mostrarPassword ? (
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.8" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.878 9.878L3 3m6.878 6.878L21 21m-6.122-6.122L21 21" />
+                  </svg>
+                ) : (
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.8" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.8" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                  </svg>
+                )}
+              </button>
             </div>
             {formik.touched.password && formik.errors.password && (
               <p className="text-pink-400 text-[11px] mt-1 font-medium">{formik.errors.password}</p>
