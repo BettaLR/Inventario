@@ -40,10 +40,10 @@ export default function LoginForm() {
         backgroundImage: `linear-gradient(to bottom, rgba(13, 7, 20, 0.75), rgba(13, 7, 20, 0.85)), url('/warehouse_bg.png')`,
       }}
     >
-      {/* Background Ambient Glowing Neon Orbs */}
-      <div className="absolute w-[500px] h-[500px] bg-purple-600/20 rounded-full blur-[140px] -top-32 -left-32 pointer-events-none" />
-      <div className="absolute w-[450px] h-[450px] bg-pink-500/25 rounded-full blur-[130px] top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-none" />
-      <div className="absolute w-[500px] h-[500px] bg-indigo-600/20 rounded-full blur-[140px] -bottom-32 -right-32 pointer-events-none" />
+      {/* Background Ambient Glowing Metallic Orbs */}
+      <div className="absolute w-[500px] h-[500px] bg-amber-700/20 rounded-full blur-[140px] -top-32 -left-32 pointer-events-none" />
+      <div className="absolute w-[450px] h-[450px] bg-orange-500/25 rounded-full blur-[130px] top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-none" />
+      <div className="absolute w-[500px] h-[500px] bg-yellow-600/20 rounded-full blur-[140px] -bottom-32 -right-32 pointer-events-none" />
 
       {/* Sleek Vertical Glassmorphism Card */}
       <div className="relative z-10 w-full max-w-[390px] bg-white/[0.05] backdrop-blur-2xl border border-white/20 rounded-[36px] shadow-2xl shadow-black/80 p-7 sm:p-9 text-white font-sans flex flex-col gap-y-5">
@@ -67,7 +67,7 @@ export default function LoginForm() {
         <form onSubmit={formik.handleSubmit} noValidate className="flex flex-col gap-y-4 text-left">
           {/* Email */}
           <div>
-            <div className="flex items-center gap-3 border-b border-white/20 focus-within:border-pink-400 py-2 transition-colors">
+            <div className="flex items-center gap-3 border-b border-white/20 focus-within:border-amber-500 py-2 transition-colors">
               <svg className="w-4 h-4 text-white/60 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.8" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
               </svg>
@@ -81,13 +81,13 @@ export default function LoginForm() {
               />
             </div>
             {formik.touched.email && formik.errors.email && (
-              <p className="text-pink-400 text-[11px] mt-1 font-medium">{formik.errors.email}</p>
+              <p className="text-amber-400 text-[11px] mt-1 font-medium">{formik.errors.email}</p>
             )}
           </div>
 
           {/* Password */}
           <div>
-            <div className="flex items-center gap-3 border-b border-white/20 focus-within:border-pink-400 py-2 transition-colors">
+            <div className="flex items-center gap-3 border-b border-white/20 focus-within:border-amber-500 py-2 transition-colors">
               <svg className="w-4 h-4 text-white/60 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.8" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
               </svg>
@@ -119,7 +119,7 @@ export default function LoginForm() {
               </button>
             </div>
             {formik.touched.password && formik.errors.password && (
-              <p className="text-pink-400 text-[11px] mt-1 font-medium">{formik.errors.password}</p>
+              <p className="text-amber-400 text-[11px] mt-1 font-medium">{formik.errors.password}</p>
             )}
           </div>
 
@@ -130,7 +130,7 @@ export default function LoginForm() {
                 type="checkbox"
                 checked={rememberMe}
                 onChange={(e) => setRememberMe(e.target.checked)}
-                className="w-3.5 h-3.5 rounded border-white/30 bg-white/10 text-pink-500 focus:ring-0 cursor-pointer"
+                className="w-3.5 h-3.5 rounded border-white/30 bg-white/10 text-amber-500 focus:ring-0 cursor-pointer"
               />
               <span className="text-white/70 text-[11px]">Remember me</span>
             </label>
@@ -151,7 +151,7 @@ export default function LoginForm() {
           <button
             type="submit"
             disabled={formik.isSubmitting}
-            className="w-full bg-gradient-to-r from-pink-500 via-purple-600 to-indigo-600 hover:opacity-95 text-white font-extrabold py-3 px-6 rounded-full uppercase tracking-[0.2em] text-xs sm:text-sm shadow-lg shadow-pink-500/30 transition-all duration-300 cursor-pointer active:scale-[0.98] disabled:opacity-50 mt-2"
+            className="w-full bg-gradient-to-r from-amber-700 via-orange-600 to-yellow-600 hover:opacity-95 text-white font-extrabold py-3 px-6 rounded-full uppercase tracking-[0.2em] text-xs sm:text-sm shadow-lg shadow-amber-900/40 transition-all duration-300 cursor-pointer active:scale-[0.98] disabled:opacity-50 mt-2"
           >
             {formik.isSubmitting ? 'INGRESANDO...' : 'LOGIN'}
           </button>

@@ -36,14 +36,21 @@ export default function App() {
                 <Route path="/dashboard" element={<DashboardPage />} />
                 <Route path="/kardex" element={<KardexPage />} />
                 <Route path="/productos" element={<ProductosPage />} />
-                <Route path="/catalogos" element={<CatalogosPage />} />
                 <Route path="/reportes" element={<ReportesPage />} />
-                <Route path="/usuarios" element={<UsuariosPage />} />
+
+                <Route element={<ProtectedRoute roles={['Admin', 'Gerente', 'Almacenista']} />}>
+                  <Route path="/catalogos" element={<CatalogosPage />} />
+                </Route>
+                <Route element={<ProtectedRoute roles={['Admin']} />}>
+                  <Route path="/usuarios" element={<UsuariosPage />} />
+                </Route>
               </Route>
 
               {/* Módulo de escaneo móvil: pantalla completa, sin chrome de escritorio */}
-              <Route path="/escanear" element={<EscanearPage />} />
-              <Route path="/escanear/producto/:codigo" element={<ProductoEscaneadoPage />} />
+              <Route element={<ProtectedRoute roles={['Admin', 'Gerente', 'Almacenista']} />}>
+                <Route path="/escanear" element={<EscanearPage />} />
+                <Route path="/escanear/producto/:codigo" element={<ProductoEscaneadoPage />} />
+              </Route>
             </Route>
 
             <Route path="/" element={<Navigate to="/dashboard" replace />} />

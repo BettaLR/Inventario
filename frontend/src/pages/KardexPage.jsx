@@ -7,6 +7,7 @@ import { listarMovimientos, registrarMovimiento } from '../services/movimientosS
 import { listarProductos, buscarPorCodigoBarras } from '../services/productosService';
 import { listarAlmacenes } from '../services/almacenesService';
 import { listarProveedores } from '../services/proveedoresService';
+import { useAuth } from '../context/AuthContext';
 import Field, { inputClass } from '../components/ui/Field';
 import Spinner from '../components/ui/Spinner';
 import EmptyState from '../components/ui/EmptyState';
@@ -71,6 +72,8 @@ function ProductThumb({ src }) {
 }
 
 export default function KardexPage() {
+  const { hasRole } = useAuth();
+  const puedeRegistrar = hasRole('Admin', 'Gerente', 'Almacenista');
   const queryClient = useQueryClient();
   const [busqueda, setBusqueda] = useState('');
   const [filtroProducto, setFiltroProducto] = useState('');
@@ -176,7 +179,8 @@ export default function KardexPage() {
       {/* Grid de 2 Columnas Independientes */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
         
-        {/* COLUMNA IZQUIERDA: Formulario de Registro */}
+        {/* COLUMNA IZQUIERDA: Formulario de Registro (solo roles operativos) */}
+        {puedeRegistrar && (
         <div className="lg:col-span-5 bg-white rounded-2xl border border-slate-200/80 shadow-2xs p-5 sm:p-6 space-y-4">
           <div className="border-b border-slate-200/80 pb-3 flex items-center justify-between">
             <h2 className="text-xs font-bold uppercase tracking-wider text-slate-700">
@@ -293,9 +297,10 @@ export default function KardexPage() {
             </button>
           </form>
         </div>
+        )}
 
         {/* COLUMNA DERECHA: Tabla Histórica de Kardex */}
-        <div className="lg:col-span-7 space-y-4">
+        <div className={`${puedeRegistrar ? 'lg:col-span-7' : 'lg:col-span-12'} space-y-4`}>
           
           {/* Barra de Filtros Rápida */}
           <div className="bg-white rounded-2xl border border-slate-200/80 p-3.5 shadow-2xs flex flex-wrap items-center justify-between gap-3">

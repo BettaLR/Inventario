@@ -3,17 +3,18 @@
 -- Passwords: Admin123! / Gerente123! / Almacen123!
 -- ============================================
 
--- Roles
+-- Roles (nombres deben coincidir exactamente con los requireRole() del backend)
 INSERT INTO roles (nombre, descripcion) VALUES
-  ('Administrador', 'Acceso total al sistema'),
+  ('Admin', 'Acceso total al sistema'),
+  ('Gerente', 'Reportes, dashboard y aprobaciones'),
   ('Almacenista', 'Registro de movimientos y consulta de stock'),
-  ('Cliente', 'Consulta de inventario y pedidos');
+  ('Cliente', 'Consulta de inventario, kardex y reportes, sin edicion');
 
 -- Usuarios (password: Admin123!)
 INSERT INTO usuarios (nombre, email, password_hash, rol_id) VALUES
   ('Erick Guerra',   'admin@inventario.com',   '$2a$10$xLsOzaEaxbgYl2QrLTpgAeBqpXCo9lsn9nPMk.LYetTzq0BU8/m9G', 1),
-  ('Ana López',      'almacen@inventario.com', '$2a$10$xLsOzaEaxbgYl2QrLTpgAeBqpXCo9lsn9nPMk.LYetTzq0BU8/m9G', 2),
-  ('Carlos Cliente', 'cliente@inventario.com', '$2a$10$xLsOzaEaxbgYl2QrLTpgAeBqpXCo9lsn9nPMk.LYetTzq0BU8/m9G', 3);
+  ('Ana López',      'almacen@inventario.com', '$2a$10$xLsOzaEaxbgYl2QrLTpgAeBqpXCo9lsn9nPMk.LYetTzq0BU8/m9G', 3),
+  ('Carlos Cliente', 'cliente@inventario.com', '$2a$10$xLsOzaEaxbgYl2QrLTpgAeBqpXCo9lsn9nPMk.LYetTzq0BU8/m9G', 4);
 
 -- Categorias
 INSERT INTO categorias (nombre, descripcion) VALUES
@@ -30,8 +31,8 @@ INSERT INTO proveedores (nombre, contacto, telefono, email) VALUES
 
 -- Almacenes
 INSERT INTO almacenes (nombre, ubicacion, responsable_id) VALUES
-  ('Almacén Principal',   'Bodega A - Planta Baja',  4),
-  ('Almacén Secundario',  'Bodega B - Planta Alta',  5);
+  ('Almacén Principal',   'Bodega A - Planta Baja',  1),
+  ('Almacén Secundario',  'Bodega B - Planta Alta',  2);
 
 -- Productos (10 productos de prueba)
 INSERT INTO productos (codigo, codigo_barras, nombre, descripcion, categoria_id, proveedor_id, precio_unitario, stock_minimo) VALUES
@@ -62,12 +63,12 @@ INSERT INTO stock (producto_id, almacen_id, cantidad) VALUES
 -- Movimientos de prueba (historial Kardex)
 INSERT INTO movimientos (producto_id, almacen_id, usuario_id, tipo, cantidad, cantidad_anterior, cantidad_nueva, motivo, referencia) VALUES
   (1, 1, 1, 'entrada',  5, 0,  5,  'Compra inicial',       'OC-001'),
-  (1, 1, 4, 'salida',   1, 5,  4,  'Entrega a sistemas',   'REQ-001'),
+  (1, 1, 2, 'salida',   1, 5,  4,  'Entrega a sistemas',   'REQ-001'),
   (2, 1, 1, 'entrada', 25, 0, 25,  'Compra inicial',       'OC-001'),
-  (2, 1, 4, 'salida',   5, 25,20,  'Dotación empleados',   'REQ-002'),
+  (2, 1, 2, 'salida',   5, 25,20,  'Dotación empleados',   'REQ-002'),
   (5, 1, 1, 'entrada', 30, 0, 30,  'Compra inicial',       'OC-002'),
-  (9, 1, 4, 'salida',   5, 30,25,  'Limpieza semanal',     'REQ-003'),
+  (9, 1, 2, 'salida',   5, 30,25,  'Limpieza semanal',     'REQ-003'),
   (8, 1, 1, 'entrada',  3, 0,  3,  'Compra inicial',       'OC-003'),
-  (3, 1, 5, 'entrada', 15, 0, 15,  'Compra inicial',       'OC-001'),
+  (3, 1, 3, 'entrada', 15, 0, 15,  'Compra inicial',       'OC-001'),
   (4, 1, 1, 'entrada',  4, 0,  4,  'Compra inicial',       'OC-001'),
-  (6, 1, 5, 'salida',   3, 53,50,  'Reposición oficinas',  'REQ-004');
+  (6, 1, 3, 'salida',   3, 53,50,  'Reposición oficinas',  'REQ-004');

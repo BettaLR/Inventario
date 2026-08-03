@@ -1,7 +1,7 @@
 const { Router } = require('express');
 const { body } = require('express-validator');
 const ctrl = require('../controllers/movimientosController');
-const { verifyToken } = require('../middleware/authMiddleware');
+const { verifyToken, requireRole } = require('../middleware/authMiddleware');
 const { handleValidationErrors } = require('../middleware/validationMiddleware');
 const asyncHandler = require('../utils/asyncHandler');
 
@@ -12,6 +12,7 @@ router.get('/', asyncHandler(ctrl.listar));
 
 router.post(
   '/',
+  requireRole('Admin', 'Gerente', 'Almacenista'),
   [
     body('producto_id').isInt().withMessage('Producto requerido'),
     body('almacen_id').isInt().withMessage('Almacén requerido'),
@@ -26,6 +27,7 @@ router.post(
 
 router.put(
   '/stock/:producto_id/:almacen_id/ubicacion',
+  requireRole('Admin', 'Gerente', 'Almacenista'),
   [
     body('ubicacion').optional({ nullable: true }).isString().isLength({ max: 50 }).withMessage('Ubicación inválida'),
     handleValidationErrors,

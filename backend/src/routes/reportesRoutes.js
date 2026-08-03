@@ -4,7 +4,7 @@ const { verifyToken, requireRole } = require('../middleware/authMiddleware');
 const asyncHandler = require('../utils/asyncHandler');
 
 const router = Router();
-router.use(verifyToken, requireRole('Admin', 'Gerente'));
+router.use(verifyToken, requireRole('Admin', 'Gerente', 'Cliente'));
 
 router.get('/inventario-valorizado', asyncHandler(ctrl.inventarioValorizado));
 router.get('/inventario-valorizado/pdf', asyncHandler(ctrl.inventarioValorizadoPdf));

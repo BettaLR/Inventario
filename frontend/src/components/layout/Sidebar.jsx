@@ -47,15 +47,16 @@ const navItems = [
   { to: '/dashboard',  label: 'Administración',         icon: 'dashboard' },
   { to: '/productos',  label: 'Productos',             icon: 'productos' },
   { to: '/kardex',     label: 'Inventarios / Kardex',   icon: 'kardex' },
-  { to: '/catalogos',  label: 'Catálogos',             icon: 'catalogos' },
+  { to: '/catalogos',  label: 'Catálogos',             icon: 'catalogos',  roles: ['Admin', 'Gerente', 'Almacenista'] },
   { to: '/reportes',   label: 'Reportes',              icon: 'reportes' },
-  { to: '/usuarios',   label: 'Usuarios',              icon: 'usuarios' },
-  { to: '/escanear',   label: 'Escanear QR/Código',    icon: 'escanear' },
+  { to: '/usuarios',   label: 'Usuarios',              icon: 'usuarios',   roles: ['Admin'] },
+  { to: '/escanear',   label: 'Escanear QR/Código',    icon: 'escanear',   roles: ['Admin', 'Gerente', 'Almacenista'] },
 ];
 
 export default function Sidebar({ onCloseMobile }) {
-  const { usuario, logout } = useAuth();
+  const { usuario, logout, hasRole } = useAuth();
   const navigate = useNavigate();
+  const itemsVisibles = navItems.filter((item) => !item.roles || hasRole(...item.roles));
 
   const handleLogout = () => {
     logout();
@@ -94,7 +95,7 @@ export default function Sidebar({ onCloseMobile }) {
 
       {/* Navigation List */}
       <nav className="flex-1 py-3 px-2 space-y-1 overflow-y-auto text-xs">
-        {navItems.map((item) => (
+        {itemsVisibles.map((item) => (
           <NavLink
             key={item.to}
             to={item.to}

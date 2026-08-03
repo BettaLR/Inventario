@@ -22,7 +22,9 @@ const requireRole = (...roles) => {
     if (!req.user) {
       return res.status(401).json({ message: 'No autenticado' });
     }
-    // Todos los usuarios autenticados (Administrador, Almacenista, Cliente) tienen acceso a los módulos
+    if (!roles.includes(req.user.rol)) {
+      return res.status(403).json({ message: 'No tienes permisos para realizar esta acción' });
+    }
     next();
   };
 };
